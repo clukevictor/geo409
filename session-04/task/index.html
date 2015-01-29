@@ -50,26 +50,22 @@
 
 <body>
     <header>
-        <h1>Map Title</h1>
-        <h2>Map Subtitle</h2>
+        <h1>Three KY cities</h1>
+        <h2>Lexinton, Frankfort and Morehead</h2>
     </header>
 
     <div id='map'></div>
 
     <footer>
-        <p>Map authored by YOUR NAME</p>
-        <p>Additional information about the data and map goes here.</p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis urna magna, maximus nec laoreet sit amet, dictum ultricies nibh. Ut id auctor lacus. Nam a dolor et justo luctus luctus. Duis a elit eget risus dictum vehicula id eu elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed sed enim nisl. Vestibulum commodo imperdiet lacus, sed facilisis erat placerat sit amet. Nulla consequat malesuada neque eget aliquet. Integer non convallis nisl, gravida ultrices ex. Fusce nec vestibulum elit. Sed elementum lectus ipsum, vulputate elementum ex laoreet a. Aenean eu ex varius, varius felis vitae, efficitur nulla. Quisque pretium laoreet ante, in sodales dui vehicula at. Mauris eu sem sapien.
-        </p>
-    </footer>
+        <p>Map authored by Luke Victor</p>
 
-    <script>
+        <script>
         var map;
         var targetDiv = 'map';
 
         var options = {
             center: [38.0489,-84.5025],
-            zoom: 8
+            zoom: 7
         }
         map = L.map(targetDiv, options);
         var tiles = L.tileLayer('http://a{s}.acetate.geoiq.com/tiles/acetate-hillshading/{z}/{x}/{y}.png', {
@@ -79,9 +75,13 @@
             maxZoom: 18
         });
         map.addLayer(tiles);
-        
+//        
         // begin writing Task C code here
-        
+        var city1Name = "Frankfort";
+        var city1Lat = 38.1970;
+        var city1Lon = -84.8630;
+        var city1Pop = 27543;
+        var city1Capitol = true;
        
         
         // end writing Task C code here
@@ -97,30 +97,48 @@
         L.marker([city1Lat,city1Lon]).addTo(map)
             .bindPopup(city1Popup);
         
-
-//        var city2Popup = "<b>"+city2Name+"</b><br>"
-//                        +"<b>population</b>: "+city2Pop;
-//        
-//        if(city2Capitol == true) {
-//            city2Popup += "<br>Capitol of the Commonwealth of Kentucky";   
-//        }
-//        
-//        L.marker([city2Lat,city2Lon]).addTo(map)
-//            .bindPopup(city2Popup);
+        var city2Name = "Lexington";
+        var city2Lat = 38.0297;
+        var city2Lon = -84.5025;
+        var city2Pop = 308428;
+        var city2Capitol = false;
+       
+        var city2Popup = "<b>"+city2Name+"</b><br>"
+                        +"<b>population</b>: "+city2Pop;
         
+        if(city2Capitol == true) {
+            city2Popup += "<br>Capitol of the Commonwealth of Kentucky";   
+        }
+        
+        L.marker([city2Lat,city2Lon]).addTo(map)
+            .bindPopup(city2Popup);
+        
+         var city3Name = "Morehead";
+        var city3Lat = 38.1836;
+        var city3Lon = -84.4411;
+        var city3Pop = 6917;
+        var city3Capitol = false;
+        var city3Hometown = true;
 
-//        var city3Popup = "<b>"+city3Name+"</b><br>"
-//                        +"<b>population</b>: "+city3Pop;
-//        
-//        if(city3Capitol == true) {
-//            city3Popup += "<br>Capitol of the Commonwealth of Kentucky";   
-//        }
-//        
-//        L.marker([city3Lat,city3Lon]).addTo(map)
-//            .bindPopup(city3Popup);
+        var city3Popup = "<b>"+city3Name+"</b><br>"
+                        +"<b>population</b>: "+city3Pop;
+        
+        if(city3Capitol == true) {
+            city3Popup += "<br>Capitol of the Commonwealth of Kentucky";   
+        }
+        
+        L.marker([city3Lat,city3Lon]).addTo(map)
+            .bindPopup(city3Popup);
+        
+    var totalPop = city1Pop + city2Pop + city3Pop;
+        var averagePop = totalPop / 3;
+            
+    document.write("Total population of three cities is " + totalPop, "<br>")
+    
+    document.write("Aaverage population of the three cities is " + averagePop)
           
     </script>
-    
+    </footer>
 </body>
 
 </html>

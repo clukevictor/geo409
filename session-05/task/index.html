@@ -86,19 +86,30 @@
         map.addLayer(tiles);
         
         // begin writing/editing Task D code here
+        var cities = ["Lexinton", "Frankfort", "Morehead"];
+        console.log(cities);
+        console.log(cities[0]);
         
-
-        for(/* add code here */) {
+        var cityCoords = [
             
-            var popup = "<b>"+/* add code here */+"</b><br>"
-                            +"<b>population</b>: "+/* add code here */;
-
-            if(/* add code here */ == true) {
-               
-                popup += "<br>Capitol of the Commonwealth of Kentucky"; 
-                
-            } 
+            [38.0297,-84.5025], 
+            [38.1970,-84.8630],
+            [38.1970,-83.8630]
+        ];
+        console.log(cityCoords)
+        var cityPops = [308428, 27543, 6917 ];        
+        var cityCapitol = [false, true, false];
+        console.log(cityCoords);
+        
+        for( var i = 0; i <= cities.length; i++){
             
+            var popup = "<b>" + cities[i]+ "</b> <br>"
+                            +"<b>population</b>: "+cityPops[i];
+
+                if(cityCapitol[i] == true) {
+                    popup += "<br>Capitol of the Commonwealth of Kentucky"; 
+                }
+        
             L.marker(cityCoords[i]).addTo(map)
                 .bindPopup(popup);
         }

@@ -81,8 +81,53 @@
         map.addLayer(tiles);
         
         // continue JavaScript coding here!
+        function helloMap(){
+        console.log("Hello Map");
+        }
+        helloMap();
+        
+        function saySomething(message){
+            
+        saySomething("hello map");
+        saySomething("my iguana has dreamy eyes");
+        return
+        saySomething("Why are these people so obsessed with iguanas?");
+        }
         
         
+        function calcAreaRect(width,height) {
+            var area = width * height;
+            console.log(area);
+        }
+        for( var  i = 0; i<=0; i++) {
+        var width = i+i;
+        var height = i*i;
+        var f = i * 2;
+        calcAreaRect(height,width);
+        }
+        
+        function sayThings() {
+            
+        console.log("thing 1");
+        console.log("thing 2");
+        return
+        console.log("thing 3");
+        }  
+        sayThings();
+        var saySomewords = function(message)
+        {
+            console.log(message);
+        }
+        saySomewords("hi");
+    
+    function outerFunction(message) {
+        console.log(message);
+        var innerFunction = function(message){
+            console.log(message);
+        }
+        innerFunction("i'm inside outerFunction");
+    }
+        outerFunction("hi there");
     </script>
     
 </body>

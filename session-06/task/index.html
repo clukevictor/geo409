@@ -59,7 +59,7 @@
     <div id='map'></div>
 
     <footer>
-        <p>Map authored by YOUR NAME</p>
+        <p>Map authored by Luke Victor</p>
         <p>Additional information about the data and map goes here.</p>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis urna magna, maximus nec laoreet sit amet, dictum ultricies nibh. Ut id auctor lacus. Nam a dolor et justo luctus luctus. Duis a elit eget risus dictum vehicula id eu elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed sed enim nisl. Vestibulum commodo imperdiet lacus, sed facilisis erat placerat sit amet. Nulla consequat malesuada neque eget aliquet. Integer non convallis nisl, gravida ultrices ex. Fusce nec vestibulum elit. Sed elementum lectus ipsum, vulputate elementum ex laoreet a. Aenean eu ex varius, varius felis vitae, efficitur nulla. Quisque pretium laoreet ante, in sodales dui vehicula at. Mauris eu sem sapien.
         </p>
@@ -85,48 +85,57 @@
         // begin writing/editing Task E code here
         
         var lexArea = 285.5;
+        var frankArea = 14.63
+        var moreheadArea = 9.3
         // create a second variable for a second city's area here
         // create a third variable for a third city's area here
         
-        prepareData(lexArea); // modify function call to pass 2 additional
+        prepareData(lexArea, frankArea, moreheadArea); // modify function call to pass 2 additional
                               // arguments
         
-        function prepareData(lexArea) { /* include 2 more parameters here */
+        function prepareData(lexArea, frankArea, moreheadArea) { /* include 2 more parameters here */
             
-            var cities = ["Lexington"]; /* include 2nd and 3rd city names */
-            var cityCoords = [
-                [38.0297, -84.4947] 
-                /* include 2nd city lat/lon here */
-                /* include 3rd city lat/lon here */
-                
-            ];
-            var cityPops = [308428]; /* include 2nd and 3rd city pops here */
+            var cities = ["Lexington", "Frankfort", "Morehead"]; /* include 2nd and 3rd city names */
+            var cityCoords = [            
+            [38.0297,-84.5025], 
+            [38.1970,-84.8630],
+            [38.1970,-83.8630]
+        ];
+            var cityPops = [308428, 27543, 6917]; /* include 2nd and 3rd city pops here */
             
-            var cityAreas = [lexArea]; /* include 2nd and 3rd city areas */
+            var cityAreas = [lexArea, frankArea, moreheadArea]; /* include 2nd and 3rd city areas */
                     
-            mapCities(cities, cityCoords); // modify function call to pass 2 additional
+            mapCities(cities, cityCoords, cityPops, cityAreas); // modify function call to pass 2 additional
                                            // arguments
             
         }
             
-        function mapCities(cities, cityCoords) { /* include 2 more parameters here */
+        function mapCities(cities, cityCoords, cityPops, cityAreas) { /* include 2 more parameters here */
             
             var units = 'miles';
             
             for(var i = 0; i < cities.length; i++) {
 
+               var density = function(calcPopDensity){
+              
+                    var calcPopDensity = cityPops[i]/cityAreas[i];
+                   
+                   return density
+                   
+               }
                 /*var density =  call a function named calcPopDensity here, passing
                                  the city population and area as arguments, and assign
                                  return value to the "density" variable */
 
                 var popup = "<b>"+cities[i]+"</b><br>"
-                                //+"<b>Density</b>: "+density.toLocaleString()+" people per sq " + units;
+                                +"<b>Density</b>: "+density.toLocaleString()+" people per sq " + units;
 
                 L.marker(cityCoords[i]).addTo(map)
                     .bindPopup(popup);
                 
             }
         }
+        s
         
         // write a function named calcPopDensity which accepts two arguments from the caller, the  
         // population and the area of a single city. The function should calculate the density

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset=utf-8 />
-    <title>Geo409 Task D</title>
+    <title>Module 06 Practice Template</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
@@ -45,11 +45,6 @@
             color: #001323;
         }
         /* Additional style rules go here! */
-        
-        .capitol{
-           fill: red;   
-        }
-
     </style>
 </head>
 
@@ -74,7 +69,7 @@
 
         var options = {
             center: [38.0489,-84.5025],
-            zoom: 8
+            zoom: 13
         }
         map = L.map(targetDiv, options);
         var tiles = L.tileLayer('http://a{s}.acetate.geoiq.com/tiles/acetate-hillshading/{z}/{x}/{y}.png', {
@@ -85,38 +80,9 @@
         });
         map.addLayer(tiles);
         
-        // begin writing/editing Task D code here
-        var cities = ["Lexinton", "Frankfort", "Morehead"];
-        console.log(cities);
-        console.log(cities[0]);
+        // continue JavaScript coding here!
         
-        var cityCoords = [
-            
-            [38.0297,-84.5025], 
-            [38.1970,-84.8630],
-            [38.1970,-83.8630]
-        ];
-        console.log(cityCoords)
-        var cityPops = [308428, 27543, 6917];        
-        var cityCapitol = [false, true, false];
-        console.log(cityCoords);
         
-        for( var i = 0; i <= cities.length; i++){
-            
-            var popup = "<b>" + cities[i]+ "</b> <br>"
-                            +"<b>population</b>: "+cityPops[i];
-
-                if(cityCapitol[i] == true) {
-                    popup += "<br>Capitol of the Commonwealth of Kentucky"; 
-                }
-        
-            L.marker(cityCoords[i]).addTo(map)
-                .bindPopup(popup);
-        }
-        
-        // end writing/editing Task D code here
-        
-          
     </script>
     
 </body>

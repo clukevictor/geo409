@@ -52,16 +52,16 @@
 
 <body>
     <header>
-        <h1>Map Title</h1>
-        <h2>Map Subtitle</h2>
+        <h1>Population Density:</h1>
+        <h2>Three Kentucky Cities</h2>
     </header>
 
     <div id='map'></div>
 
     <footer>
         <p>Map authored by Luke Victor</p>
-        <p>Additional information about the data and map goes here.</p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis urna magna, maximus nec laoreet sit amet, dictum ultricies nibh. Ut id auctor lacus. Nam a dolor et justo luctus luctus. Duis a elit eget risus dictum vehicula id eu elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed sed enim nisl. Vestibulum commodo imperdiet lacus, sed facilisis erat placerat sit amet. Nulla consequat malesuada neque eget aliquet. Integer non convallis nisl, gravida ultrices ex. Fusce nec vestibulum elit. Sed elementum lectus ipsum, vulputate elementum ex laoreet a. Aenean eu ex varius, varius felis vitae, efficitur nulla. Quisque pretium laoreet ante, in sodales dui vehicula at. Mauris eu sem sapien.
+        <p>hi!</p>
+        <p>
         </p>
     </footer>
 
@@ -107,22 +107,16 @@
                     
             mapCities(cities, cityCoords, cityPops, cityAreas); // modify function call to pass 2 additional
                                            // arguments
-            
-        }
-            
+        
+        
         function mapCities(cities, cityCoords, cityPops, cityAreas) { /* include 2 more parameters here */
             
             var units = 'miles';
             
             for(var i = 0; i < cities.length; i++) {
-
-               var density = function(calcPopDensity){
-              
-                    var calcPopDensity = cityPops[i]/cityAreas[i];
-                   
-                   return density
-                   
-               }
+                var density = calcPopDensity(cityAreas[i],cityPops[i],units);
+                console.log(density);
+               
                 /*var density =  call a function named calcPopDensity here, passing
                                  the city population and area as arguments, and assign
                                  return value to the "density" variable */
@@ -135,7 +129,22 @@
                 
             }
         }
-        s
+            function calcPopDensity(cityAreas,cityPops,units){
+                if (units == 'miles'){
+//                    not really sure what this conditional will do, wouldn't it make more sense by the popup (i.e. if mi -->this popup with mi verbage, if km-->this other popup with km verbage)?
+            density = cityPops / cityAreas;
+                    console.log(cityAreas);
+                    console.log(cityPops);
+                    console.log(density);
+            return density
+            
+                }      
+            }
+            
+    }
+        
+            
+        
         
         // write a function named calcPopDensity which accepts two arguments from the caller, the  
         // population and the area of a single city. The function should calculate the density

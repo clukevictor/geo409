@@ -81,28 +81,27 @@
         map.addLayer(tiles);
         
         // continue JavaScript coding here!
-             var iguana = { 
+     var iguana = { 
         name: "Jack", 
-        weight: 4.2, // assume kilograms
+        weight: 4.2, 
         age: 8, 
         eyes: "dreamy",
-        questForWorldDomination: true 
+        questForWorldDomination: true, 
+        invasionPlans: function(inData) {
+            // iguana can do something with data here
+            console.log(inData);
+        }
     }
 
-    for (var key in iguana) {
-       console.log(key);// outputs "name", "weight", "age", "eyes", "questForWorldDomination"
-    }
-        console.log(key);
-        console.log(iguana[key]);
-        // Poisoning Object.prototype
-Object.prototype.love = 1;
+    var lexData = {
+       lat: 38.23,
+       lon: -89.21,
+       name: "Lexington",
+       pop: 821325
 
-var foo = {moo: 2};
-for(var i in foo) {
-    console.log(i);
-    console.log([i])// prints both bar and moo
-}
-        
+    }
+
+    iguana.invasionPlans(lexData);
     </script>
     
 </body>

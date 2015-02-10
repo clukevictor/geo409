@@ -52,32 +52,56 @@
 
 <body>
     <header>
-        <h1>Map Title</h1>
-        <h2>Map Subtitle</h2>
+        <h1>Click Calculating Log Map</h1>
+        <h2>Aerial</h2>
     </header>
 
     <div id='map'></div>
 
     <footer>
-        <p>Map authored by YOUR NAME</p>
-        <p>Additional information about the data and map goes here.</p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis urna magna, maximus nec laoreet sit amet, dictum ultricies nibh. Ut id auctor lacus. Nam a dolor et justo luctus luctus. Duis a elit eget risus dictum vehicula id eu elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed sed enim nisl. Vestibulum commodo imperdiet lacus, sed facilisis erat placerat sit amet. Nulla consequat malesuada neque eget aliquet. Integer non convallis nisl, gravida ultrices ex. Fusce nec vestibulum elit. Sed elementum lectus ipsum, vulputate elementum ex laoreet a. Aenean eu ex varius, varius felis vitae, efficitur nulla. Quisque pretium laoreet ante, in sodales dui vehicula at. Mauris eu sem sapien.
-        </p>
+        
+        <div id='distances'></div>
+        
+        <p>Map authored by Luke Victor</p>
+                
     </footer>
 
     <script>
 
     var map = L.map('map', {
         center: [40,-94],
-        zoom: 4
+        zoom: 4,
+        minZoom: 4,
+        maxZoom: 12
     });
                 
-    var redIguana = L.latLng(40.7718,-111.9124);
+    var redIguana = L.latLng(40.7718, -111.9124);
         
     map.on('click', function(e){
-        console.log(e.latlng);   
+        var clickLatLong = (e.latlng);
+        
+        var distIguanaClick = clickLatLong.distanceTo(redIguana);
+            console.log("Red Iguana " + distIguanaClick);
+        
+        var bounds = map.getBounds();
+        
+        var bottomLeft = bounds.getSouthWest();
+        
+        var distIguanaSW = bottomLeft.distanceTo(redIguana);
+             
+            console.log("Distance--Red Iguana to Click= " + distIguanaClick + "Distance--Red Iguana to SW edge of map= " + distIguanaSW)
+        
+            document.getElementById("distances").innerHTML = "<b>Distance--Red Iguana to Click= </b>" + distIguanaClick + "<br><b> Distance--Red Iguana to SW edge of map= </b>" + distIguanaSW +"<br>";
     });
-                  
+    
+        
+        var tiles = L.tileLayer('http://oatile{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg', {
+	attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a> &mdash; Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency',
+	subdomains: '1234'
+});
+     map.addLayer(tiles);   
+    ;    
+    
     </script>
     
 </body>

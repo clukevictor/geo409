@@ -130,8 +130,8 @@
            console.log(names)
            var pop = props.population;
            var state = props.state
-           buildPopUp(names,pop,state);
-            var popup = chameleon; 
+          
+            var popup =  buildPopUp(cities[i].name,pop,state); 
                 
 //                "<b>" +cities[i].name + ", " + props.state + "</b><br>"+ chameleon;
 //                "</b><br>"
@@ -142,9 +142,9 @@
                 .bindPopup(popup); 
        }
         
-        function buildPopUp(names,pop,state){
+        function buildPopUp(city){
             console.log(names);
-            if(state == "KY"){
+            if(city['state'] == "KY"){
                 var colorClass = "blue";
             } else if (state == "IN"){
                 var colorClass = "red";
@@ -153,7 +153,8 @@
             }
              chameleon = "<div class='"+colorClass+"'><b>"+names+ ", " +state+"</b><br>"+
         "<b>Population</b>: "+pop.toLocaleString()+"<div>";
-            return chameleon
+            return "<div class='"+colorClass+"'><b>"+names+ ", " +state+"</b><br>"+
+        "<b>Population</b>: "+pop.toLocaleString()+"<div>";
         }
     
     

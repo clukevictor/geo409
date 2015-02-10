@@ -45,8 +45,6 @@
             color: #001323;
         }
         /* Additional style rules go here! */
-        
-
     </style>
 </head>
 
@@ -70,7 +68,7 @@
         var targetDiv = 'map';
 
         var options = {
-            center: [38.0489,-84.5025],
+            center: [38.0489, -84.5025],
             zoom: 8
         }
         map = L.map(targetDiv, options);
@@ -81,80 +79,75 @@
             maxZoom: 18
         });
         map.addLayer(tiles);
-        
-        // begin writing/editing Task E code here
-        
+
+         // begin writing/editing Task E code here
+
         var lexArea = 285.5;
         var frankArea = 14.63
         var moreheadArea = 9.3
-        // create a second variable for a second city's area here
-        // create a third variable for a third city's area here
-        
-        prepareData(lexArea, frankArea, moreheadArea); // modify function call to pass 2 additional
-                              // arguments
-        
+            // create a second variable for a second city's area here
+            // create a third variable for a third city's area here
+
+         prepareData(lexArea, frankArea, moreheadArea); // modify function call to pass 2 additional
+         // arguments
+
         function prepareData(lexArea, frankArea, moreheadArea) { /* include 2 more parameters here */
-            
+
             var cities = ["Lexington", "Frankfort", "Morehead"]; /* include 2nd and 3rd city names */
-            var cityCoords = [            
-            [38.0297,-84.5025], 
-            [38.1970,-84.8630],
-            [38.1970,-83.8630]
+            var cityCoords = [
+            [38.0297, -84.5025],
+            [38.1970, -84.8630],
+            [38.1970, -83.8630]
         ];
             var cityPops = [308428, 27543, 6917]; /* include 2nd and 3rd city pops here */
-            
+
             var cityAreas = [lexArea, frankArea, moreheadArea]; /* include 2nd and 3rd city areas */
-                    
+
             mapCities(cities, cityCoords, cityPops, cityAreas); // modify function call to pass 2 additional
-                                           // arguments
-        
-        
+            // arguments
+
+        }
+
         function mapCities(cities, cityCoords, cityPops, cityAreas) { /* include 2 more parameters here */
-            
-            var units = 'miles';
-            
-            for(var i = 0; i < cities.length; i++) {
-                var density = calcPopDensity(cityAreas[i],cityPops[i],units);
+
+            var units = 'km';
+
+            for (var i = 0; i < cities.length; i++) {
+                var density = calcPopDensity(cityAreas[i], cityPops[i], units);
                 console.log(density);
-               
+
                 /*var density =  call a function named calcPopDensity here, passing
                                  the city population and area as arguments, and assign
                                  return value to the "density" variable */
 
-                var popup = "<b>"+cities[i]+"</b><br>"
-                                +"<b>Density</b>: "+density.toLocaleString()+" people per sq " + units;
+                var popup = "<b>" + cities[i] + "</b><br>" + "<b>Density</b>: " + density.toLocaleString() + " people per sq " + units;
 
                 L.marker(cityCoords[i]).addTo(map)
                     .bindPopup(popup);
-                
+
             }
         }
-            function calcPopDensity(cityAreas,cityPops,units){
-                if (units == 'miles'){
-//                    not really sure what this conditional will do, wouldn't it make more sense by the popup (i.e. if mi -->this popup with mi verbage, if km-->this other popup with km verbage)?
-            density = cityPops / cityAreas;
-                    console.log(cityAreas);
-                    console.log(cityPops);
-                    console.log(density);
-            return density
-            
-                }      
-            }
-            
-    }
-        
-            
-        
-        
-        // write a function named calcPopDensity which accepts two arguments from the caller, the  
-        // population and the area of a single city. The function should calculate the density
-        // of the city with these two values and return the result to the caller 
-        
 
-        // end writing/editing Task E code here
-          
+        function calcPopDensity(cityAreas, cityPops, units) {
+            if (units == 'miles') {
+                return cityPops / cityAreas;
+            } else if (units == 'km') {
+                return cityPops / (cityAreas * 1.60934 * 1.60934); // multiply conversion twice to account for sq
+            }
+
+        }
+
+
+
+
+         // write a function named calcPopDensity which accepts two arguments from the caller, the  
+         // population and the area of a single city. The function should calculate the density
+         // of the city with these two values and return the result to the caller 
+
+
+         // end writing/editing Task E code here
     </script>
-    
+
 </body>
 
 </html>

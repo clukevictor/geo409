@@ -192,31 +192,23 @@
         landZones.addTo(map);
         
         
-        var marker = {
-            draggable: false
-        };  // keep this code
-        console.log(marker)
-        
-        
+        var marker ;  // keep this code
         map.on('click',function(e){  // keep this code
 // uncomment this code after step seven is finished          
-            if(map.hasLayer(marker)) { 
-                if(marker.draggable == false){
+            if(map.hasLayer(marker)) {               
                 map.removeLayer(marker);
-            }}
+            }
 //              step seven here            
 
         var clickLatLng = e.latlng;
-        console.log(marker);
-           L.marker(clickLatLng, {'draggable': marker.draggable}).addTo(map);
-            
-            
+        
+            marker = L.marker(clickLatLng).addTo(map);
 //              console.log(marker);
 //              step eight here
             testDistance(clickLatLng);
          
         });  // keep this code  
-         console.log(marker);    
+         console.log(testDistance);    
         function testDistance(clickLatLng) {
             
             
@@ -231,47 +223,11 @@
            distClick2Radius= circleCenter.distanceTo(clickLatLng) - radius;
                 console.log (distClick2Radius);
 //              step 10 here
-               
-                if (distClick2Radius <= 2200){
-                    do {
+                if (distClick2Radius < 2200){
                layer.setStyle(landZoneStyle1);
-            marker = L.marker(event.latlng);
-    map.on('drag', function(event){
-            var marker = event.target;
-            var position = marker.getLatLng();
-            alert(position);
-            marker.setLatLng([position]).bindPopup(position).update();
-    });
-                       
-                        } while (marker.draggable==true);
-                                              }
-        else if (distClick2Radius > 2200){
+                } else if (distClick2Radius > 2200){
                     layer.setStyle(landZoneStyle2)
-                    marker= {
-                           draggable: false
-                       }
-                    
-                       }
-            
-            
-                     function draggin(marker){ 
-               map.on('drag', function(event){
-                do{
-            
-            var position = marker.getLatLng();            
-            alert(position);
-            marker.setLatLng([position],{draggable: true}).bindPopup(position).update();
-                    marker = marker.getLatLng
-                    distClick2Radius2= marker.distanceTo(clickLatLng) - radius;
-                console.log (distClick2Radius2);
-                } while (distClick2Radius2 < 2200);
-                   do
-                   {
-                       
-                   }while (distClick2Radius2 >=2200);
-    });
-                             
-                         }
+                }
             });
         }
   

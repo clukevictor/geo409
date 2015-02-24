@@ -170,51 +170,108 @@
         
         
 //      steps 3 here
-            var landZoneStyle1 = L.circle({
-        color: "#690700",  // changes the stroke color
-        fillColor: "#ff1200"  // changes the fill color
-    });
+            var landZoneStyle1 = {
+        color: "#690700",  
+        fillColor: "#ff1200"
+    };
 
-    var landZoneStyle2 = L.circle({
-        color: "#690700",  // changes the stroke color
-        fillColor: "#ff1200" 
-        });
+    var landZoneStyle2 = {
+        color: "#000469",  
+        fillColor: "#a1f7f7" 
+        };
 //      steps 4-6  here
         var landZones = L.layerGroup();     // step 4-layer group
         
-           for(var i = 1; i < iguanaZones.length; i++){
+           for(var i = 0; i < iguanaZones.length; i++){
             var landZoneCords =  L.latLng(iguanaZones[i].coordinates);
             var iguanaCircle = L.circle(landZoneCords,iguanaZones[i].properties.size);
 //            console.log(iguanaCircle);
             iguanaCircle.addTo(landZones);
            }
+        
         landZones.addTo(map);
-    var marker;  // keep this code
-   
-          map.on('click',function(e){  // keep this code
+        
+        
+        var marker = {
+            draggable: false
+        };  // keep this code
+        console.log(marker)
+        
+        
+        map.on('click',function(e){  // keep this code
 // uncomment this code after step seven is finished          
-            if(map.hasLayer(marker)) {               
+            if(map.hasLayer(marker)) { 
+                if(marker.draggable == false){
                 map.removeLayer(marker);
-            }
-//         console.log(e.latlng);
-              
-         var marker = e.latlng;
-               var marker = L.marker(marker).addTo(map);
-              console.log(marker);
+            }}
 //              step seven here            
-//              step eight here
-        return marker
-        });  // keep this code  
-             
-//         marker = L.marker(e.latlng).addTo(map);
-//         
+
+        var clickLatLng = e.latlng;
         console.log(marker);
-        function testDistance(marker,landZones) {
+           L.marker(clickLatLng, {'draggable': marker.draggable}).addTo(map);
             
             
-            iguanaGroup.eachLayer(function(layer) {
+//              console.log(marker);
+//              step eight here
+            testDistance(clickLatLng);
+         
+        });  // keep this code  
+         console.log(marker);    
+        function testDistance(clickLatLng) {
+            
+            
+            landZones.eachLayer(function(layer) {
 //              step 9 here
+                var circleCenter = layer.getLatLng();
+                console.log(circleCenter);
+                
+              var radius = layer.getRadius();
+                console.log(radius);
+                
+           distClick2Radius= circleCenter.distanceTo(clickLatLng) - radius;
+                console.log (distClick2Radius);
 //              step 10 here
+               
+                if (distClick2Radius <= 2200){
+                    do {
+               layer.setStyle(landZoneStyle1);
+            marker = L.marker(event.latlng);
+    map.on('drag', function(event){
+            var marker = event.target;
+            var position = marker.getLatLng();
+            alert(position);
+            marker.setLatLng([position]).bindPopup(position).update();
+    });
+                       
+                        } while (marker.draggable==true);
+                                              }
+        else if (distClick2Radius > 2200){
+                    layer.setStyle(landZoneStyle2)
+                    marker= {
+                           draggable: false
+                       }
+                    
+                       }
+            
+            
+                     function draggin(marker){ 
+               map.on('drag', function(event){
+                do{
+            
+            var position = marker.getLatLng();            
+            alert(position);
+            marker.setLatLng([position],{draggable: true}).bindPopup(position).update();
+                    marker = marker.getLatLng
+                    distClick2Radius2= marker.distanceTo(clickLatLng) - radius;
+                console.log (distClick2Radius2);
+                } while (distClick2Radius2 < 2200);
+                   do
+                   {
+                       
+                   }while (distClick2Radius2 >=2200);
+    });
+                             
+                         }
             });
         }
   

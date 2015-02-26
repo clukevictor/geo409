@@ -49,11 +49,11 @@
         .blue {
             color: #165bb6;
         }
-        .red {
-            color: #cc0000;
+        .yello {
+            color: #f8f879;
         }
-        .purple {
-            color: #b6165b; 
+        .cyan {
+            color: cyan; 
         }
         
 
@@ -62,38 +62,259 @@
 
 <body>
     <header>
-        <h1>Map Title</h1>
-        <h2>Map Subtitle</h2>
+        <h1>Wien Tour</h1>
+        <h2></h2>
     </header>
 
     <div id='map'></div>
 
     <footer>
-        <p>Map authored by YOUR NAME</p>
-        <p>Additional information about the data and map goes here.</p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis urna magna, maximus nec laoreet sit amet, dictum ultricies nibh. Ut id auctor lacus. Nam a dolor et justo luctus luctus. Duis a elit eget risus dictum vehicula id eu elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed sed enim nisl. Vestibulum commodo imperdiet lacus, sed facilisis erat placerat sit amet. Nulla consequat malesuada neque eget aliquet. Integer non convallis nisl, gravida ultrices ex. Fusce nec vestibulum elit. Sed elementum lectus ipsum, vulputate elementum ex laoreet a. Aenean eu ex varius, varius felis vitae, efficitur nulla. Quisque pretium laoreet ante, in sodales dui vehicula at. Mauris eu sem sapien.
+        <p>Map authored by Luke Victor</p>
+        <p>Tour of Luke's Favorite Spots in Vienna</p>
+        <p>
         </p>
     </footer>
 
     <script>
 
         var map = L.map('map', {
-            center: [38.96,-85.36],
-            zoom: 8,
+            center: [48.19, 16.35],
+            zoom: 12,
         });
-       
+               
+
         var tiles = L.tileLayer('http://a{s}.acetate.geoiq.com/tiles/acetate-hillshading/{z}/{x}/{y}.png', {
             attribution: '&copy;2012 Esri & Stamen, Data from OSM and Natural Earth',
             subdomains: '0123',
             minZoom: 4,
-            maxZoom: 12
+            maxZoom: 18
         });
         map.addLayer(tiles);
         
         // Begin writing/modifying code for Task H here
+        var wienTour = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "marker-color": "#7e7e7e",
+        "marker-size": "medium",
+        "marker-symbol": "",
+        "name": "Red Carpet Hostel",
+        "size": 250
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.3414067029953,
+          48.19383187660284
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stroke": "#555555",
+        "stroke-width": 2,
+        "stroke-opacity": 1,
+        "fill": "#555555",
+        "fill-opacity": 0.5,
+        "name": "Schonbrunn"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              16.303882598876953,
+              48.18760570101003
+            ],
+            [
+              16.297359466552734,
+              48.17604539578137
+            ],
+            [
+              16.29993438720703,
+              48.17409934549361
+            ],
+            [
+              16.302337646484375,
+              48.17684668913743
+            ],
+            [
+              16.309375762939453,
+              48.17364144057407
+            ],
+            [
+              16.310405731201172,
+              48.176388808753124
+            ],
+            [
+              16.314353942871094,
+              48.17753350204666
+            ],
+            [
+              16.320018768310547,
+              48.189894561126884
+            ],
+            [
+              16.312808990478512,
+              48.189665679715326
+            ],
+            [
+              16.310920715332028,
+              48.187834591621865
+            ],
+            [
+              16.303882598876953,
+              48.18760570101003
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+      "name": "your route"
+      },
+      "geometry": {
+        "type": "LineString",
         
+        "coordinates": [
+          [
+            16.41735076904297,
+            48.225816264438436
+          ],
+          [
+            16.428937911987305,
+            48.21786761273314
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "marker-color": "#7e7e7e",
+        "marker-size": "medium",
+        "marker-symbol": "",
+        "name": "Donauinsel",
+        "size": 1200
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.435954570770264,
+          48.208544959594924
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            16.34143352508545,
+            48.19388551641417
+          ],
+          [
+            16.337850093841553,
+            48.195888029190115
+          ],
+          [
+            16.318988800048828,
+            48.186032050381094
+          ],
+          [
+            16.440138816833496,
+            48.21180522147898
+          ],
+          [
+            16.437692642211914,
+            48.21217699254464
+          ],
+          [
+            16.435976028442383,
+            48.21117606429588
+          ],
+          [
+            16.435976028442383,
+            48.208773756674425
+          ],
+          [
+            16.439967155456543,
+            48.21169082983882
+          ],
+          [
+            16.371839046478268,
+            48.20827326173542
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "marker-color": "#7e7e7e",
+        "marker-size": "medium",
+        "marker-symbol": "",
+        "name": "Stephansplatz",
+        "size": 500
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.37183368206024,
+          48.20827147424471
+        ]
+      }
+    }
+  ]
+}
 
-          
+        var pointOptions = {
+        color: "blue",
+        dashArray: "2, 12"
+    }
+    var lineOptions = {
+        color: "yellow"  
+    }
+    var polygonOptions = {
+        dashArray: "3, 10", 
+        weight: 10,
+        color: "cyan",
+        fillColor: "#ffff61"
+    }
+
+    
+    var wienTourLGeoJson = L.geoJson(wienTour, {
+        pointToLayer : function(feature, latlng) {
+            return L.circle(latlng, feature.properties.size);
+        },
+//        style : function(feature) {
+//            return { dashArray: "5, 10",
+//                     weight: 10
+//                   }   
+//        },
+        onEachFeature: function(feature, layer) {
+            if(feature.geometry.type == "Point") {
+                layer.setStyle(pointOptions);
+                layer.bindPopup("This is "+feature.properties.name+ ". Enjoy!")
+            }
+            if(feature.geometry.type == "LineString") {
+                layer.setStyle(lineOptions);
+                layer.bindPopup("This is "+feature.properties.name+ ". Enjoy !")
+            }   
+            if(feature.geometry.type == "Polygon") {
+                layer.setStyle(polygonOptions);
+                layer.bindPopup("This is "+feature.properties.name+ ". Enjoy!")
+            }
+        }
+    }).addTo(map);
     </script>
     
 </body>

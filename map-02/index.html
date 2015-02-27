@@ -65,12 +65,14 @@
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis urna magna, maximus nec laoreet sit amet, dictum ultricies nibh. Ut id auctor lacus. Nam a dolor et justo luctus luctus. Duis a elit eget risus dictum vehicula id eu elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed sed enim nisl. Vestibulum commodo imperdiet lacus, sed facilisis erat placerat sit amet. Nulla consequat malesuada neque eget aliquet. Integer non convallis nisl, gravida ultrices ex. Fusce nec vestibulum elit. Sed elementum lectus ipsum, vulputate elementum ex laoreet a. Aenean eu ex varius, varius felis vitae, efficitur nulla. Quisque pretium laoreet ante, in sodales dui vehicula at. Mauris eu sem sapien.
         </p>
     </footer>
-    <script src="power-plants.js"></script>
+    <script src="power-plants-assignment.js"></script>
     <script>
-
+   var knox = {
+          coordinates: [-83.9422,35.9728]
+      }
         var map = L.map('map', {
-            center: [36,-94],
-            zoom: 4,
+            center: [35.9728,-83.9422],
+            zoom: 7
         });
        
         var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', 
@@ -81,25 +83,15 @@
             maxZoom: 18
         });
         map.addLayer(tiles);
-        
+//                  console.log(plants.featureCollection);
+ 
         // Begin writing/modifying code for Map 2 here
-        
+       
         plants.features.sort(function(a,b) {
-			return b.properties.capacity_mw - a.properties.capacity_mw;
+			return b.properties.capacity - a.properties.capacity;
             
 		});
-//L.geoJson(plants, {
-//        pointToLayer: function(feature,latlng) {
-//             return L.circleMarker(latlng, {
-//                 color:'orange',
-//                 weight: 10,
-//                 fillColor: 'yellow',
-//                 fillOpacity: 4,
-//                 radius: 4
-//                 });   
-//        }
-//    }).addTo(map);
-        
+
 
                     L.geoJson(plants, {
                 pointToLayer: function(feature,latlng) {
@@ -108,29 +100,37 @@
                          weight: 1,
                          fillColor: 'yellow',
                          fillOpacity: .8,
-                         radius: getRadius(feature.properties.capacity_mw)
+                         radius: getRadius(feature.properties.capacity),
+//                        
                      });   
                 },
+        
                 filter: function(feature, layer) {
-                    if(feature.properties.capacity_mw >= 1752){
+                                                    console.log(feature.geometry.coordinates);
+
+                getDist(feature.geometry.coordinates);
+                    
+                    console.log(getDist);
+                
+                    if(feature.properties.source["Hydro"] && feature.properties.capacity < 500 && knoxDist < 400)
+                        {
                         return feature;   
                     }
                 },
                 onEachFeature: function(feature,layer) {
                     var props = feature.properties;
                     var content = "<b>"+props.plant_name+"</b><br>"+
-                        props.capacity_mw.toLocaleString()+" MW<br>";
-                    var source = props.fuel_source;
-                    for(var fuel in source){
-                        console.log(fuel, source[fuel]);
-                        content+="<b>"+fuel+"</b>: "+source[fuel].toLocaleString()+" MW<br>";
+                        props.capacity.toLocaleString()+" MW<br>";
+                    var fuelSource = props.source;
+                    for(var fuel in fuelSource){
+                        console.log(fuel, fuelSource[fuel]);
+                        content+="<b>"+name+"<b/><br>"+"<b>"+fuel+"<b/>: "+fuelSource[fuel].toLocaleString()+" MW<br>"+"This Plant is "+/*getDist +*/"<b> KM </b>"+"from Knoxville, TN."
+                         layer.bindPopup(content);
                     }
-                    layer.bindPopup(content); 
+                     
 
                     layer.on('mouseover', function() {
-                        layer.setStyle({
-                            fillColor: 'red'
-                        });
+                       layer.openPopup();
                     });
                     layer.on('mouseout', function() {
                         layer.setStyle({
@@ -141,9 +141,14 @@
             }).addTo(map);
 
 
-            function getRadius(val) {
+  function getDist(plantCoords) {
+      console.log(plantCoords);
+      
+      var knoxDistance = plantCoords.distanceTo(plantCoords);
+        }
+function getRadius(val) {
                 var radius = Math.sqrt(val/Math.PI);
-                return radius * .8;   
+                return radius * .9;   
             }        
         
     </script>

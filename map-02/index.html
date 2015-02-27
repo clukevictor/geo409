@@ -74,7 +74,7 @@
             center: [35.9728,-83.9422],
             zoom: 7
         });
-       
+       var knoxDist;
         var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', 
                                          {
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
@@ -104,20 +104,18 @@
 //                        
                      });   
                 },
+                       
         
                 filter: function(feature, layer) {
-                                                    console.log(feature.geometry.coordinates);
-
-                getDist(feature.geometry.coordinates);
-                    
-                    console.log(getDist);
-                
-                    if(feature.properties.source["Hydro"] && feature.properties.capacity < 500 && knoxDist < 400)
+                                                           
+                 if(feature.properties.source["Hydro"] && feature.properties.capacity < 500 && knoxDist < 400)
                         {
                         return feature;   
-                    }
+                    }                 
                 },
                 onEachFeature: function(feature,layer) {
+                    knoxDist =  getDist(feature.geometry.coordinates).addTo(layer);
+                console.log(getDist);
                     var props = feature.properties;
                     var content = "<b>"+props.plant_name+"</b><br>"+
                         props.capacity.toLocaleString()+" MW<br>";
@@ -127,11 +125,15 @@
                         content+="<b>"+name+"<b/><br>"+"<b>"+fuel+"<b/>: "+fuelSource[fuel].toLocaleString()+" MW<br>"+"This Plant is "+/*getDist +*/"<b> KM </b>"+"from Knoxville, TN."
                          layer.bindPopup(content);
                     }
-                     
-
+                    
                     layer.on('mouseover', function() {
-                       layer.openPopup();
+                       layer.openPopup(),
+                        layer.setStyle({
+                            fillColor: 'orange'
                     });
+                    })
+                    
+                        
                     layer.on('mouseout', function() {
                         layer.setStyle({
                             fillColor: 'yellow'
@@ -144,7 +146,7 @@
   function getDist(plantCoords) {
       console.log(plantCoords);
       
-      var knoxDistance = plantCoords.distanceTo(plantCoords);
+      knoxDistance = plantCoords.distanceTo(plantCoords);
         }
 function getRadius(val) {
                 var radius = Math.sqrt(val/Math.PI);

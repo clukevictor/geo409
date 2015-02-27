@@ -101,20 +101,23 @@
                          fillColor: 'yellow',
                          fillOpacity: .8,
                          radius: getRadius(feature.properties.capacity),
-//                        
-                     });   
+                       className: "distance",
+                         distance: getDist(feature.geometry.coordinates)
+                     });
+                    console.log(layer.distance);
                 },
+                        
                        
         
                 filter: function(feature, layer) {
                                                            
-                 if(feature.properties.source["Hydro"] && feature.properties.capacity < 500 && knoxDist < 400)
+                 if(feature.properties.source["Hydro"] && feature.properties.capacity < 500 && feature.distance < 400)
                         {
                         return feature;   
                     }                 
                 },
                 onEachFeature: function(feature,layer) {
-                    knoxDist =  getDist(feature.geometry.coordinates).addTo(layer);
+                   
                 console.log(getDist);
                     var props = feature.properties;
                     var content = "<b>"+props.plant_name+"</b><br>"+

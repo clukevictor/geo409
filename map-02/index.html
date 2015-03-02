@@ -70,11 +70,13 @@
    var knox = {
           coordinates: [-83.9422,35.9728]
       }
+      var knoxDist = knox.coordinates
+      var knoxDistance;
         var map = L.map('map', {
             center: [35.9728,-83.9422],
             zoom: 7
         });
-       var knoxDist;
+       
         var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', 
                                          {
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
@@ -101,32 +103,32 @@
                          fillColor: 'yellow',
                          fillOpacity: .8,
                          radius: getRadius(feature.properties.capacity),
-                       className: "distance",
-                         distance: getDist(feature.geometry.coordinates)
-                     });
-                    console.log(layer.distance);
-                },
-                        
                        
-        
-                filter: function(feature, layer) {
+                     });
+                      
+
+                },                    
+            filter: function(feature, layer) {
+                knoxDistance = (getDist(feature.geometry.coordinates)*0.001).toFixed(2);
+                
                                                            
-                 if(feature.properties.source["Hydro"] && feature.properties.capacity < 500 && feature.distance < 400)
+                 if(feature.properties.source["Hydro"] && feature.properties.capacity < 500 && knoxDistance < 400)
                         {
-                        return feature;   
+                            console.log(feature.properties.plant_name + knoxDistance);
+                            console.log(feature);
+                        return feature   
                     }                 
                 },
                 onEachFeature: function(feature,layer) {
-                   
-                console.log(getDist);
                     var props = feature.properties;
                     var content = "<b>"+props.plant_name+"</b><br>"+
                         props.capacity.toLocaleString()+" MW<br>";
                     var fuelSource = props.source;
                     for(var fuel in fuelSource){
-                        console.log(fuel, fuelSource[fuel]);
-                        content+="<b>"+name+"<b/><br>"+"<b>"+fuel+"<b/>: "+fuelSource[fuel].toLocaleString()+" MW<br>"+"This Plant is "+/*getDist +*/"<b> KM </b>"+"from Knoxville, TN."
+//                        console.log(fuel, fuelSource[fuel]);
+                        content+="<b>"+name+"<b/><br>"+"<b>"+fuel+"<b/>: "+fuelSource[fuel].toLocaleString()+" MW<br>"+"This Plant is "+ knoxDistance +"<b> KM </b>"+"from Knoxville, TN."
                          layer.bindPopup(content);
+                        console.log(knoxDistance)
                     }
                     
                     layer.on('mouseover', function() {
@@ -149,7 +151,12 @@
   function getDist(plantCoords) {
       console.log(plantCoords);
       
-      knoxDistance = plantCoords.distanceTo(plantCoords);
+      var plantLatLng = L.latLng(plantCoords);
+      console.log(plantLatLng);
+      var duck = plantLatLng
+      var knoxDistance = plantLatLng.distanceTo(knoxDist);
+//      console.log(distance);
+      return knoxDistance
         }
 function getRadius(val) {
                 var radius = Math.sqrt(val/Math.PI);

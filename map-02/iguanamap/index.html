@@ -70,13 +70,14 @@
    var knox = {
           coordinates: [35.9728,-83.9422]
       }
+   var squareSide;
          
 
       var knoxDist = knox.coordinates;
       var knoxDistance;
         var map = L.map('map', {
             center: [35.9728,-83.9422],
-            zoom: 6
+            zoom:4
         });
         
  var StyleCoal = {
@@ -121,18 +122,27 @@
 
                     L.geoJson(plants, {
             pointToLayer: function(feature,latlng) {
-                     return L.circleMarker(latlng, {
-                         color: 'cyan',
-                         weight: 5,
-                         fillColor: 'yellow',
-                         fillOpacity: .7,
-                         radius: getRadius(feature.properties.capacity),
-                       });
-                     },                    
+//                     return L.circleMarker(latlng, {
+//                         color: 'cyan',
+//                         weight: 5,
+//                         fillColor: 'yellow',
+//                         fillOpacity: .7,
+//                         radius: getRadius(feature.properties.capacity),
+//                       });
+           
+               var myIcon = L.icon({
+iconUrl:'http://upload.wikimedia.org/wikipedia/commons/7/74/Farm-Fresh_chameleon.png',
+    iconSize: [getSquare(feature.properties.capacity), getSquare(feature.properties.capacity)],
+    iconAnchor: [22, 94],
+    popupAnchor: [-3, -76],
+                     })
+                return L.marker(latlng, {icon: myIcon}) 
+            },                    
             
             filter: function(feature, layer) {
+//                console.log(layer);
                 knoxDistance = (getDist(feature.geometry.coordinates)*0.001).toFixed(2);
-                if((feature.properties.source["Coal"] || feature.properties.source["Hydro"]) && feature.properties.capacity < 5000 && knoxDistance < 400)
+                if(/*(feature.properties.source["Coal"] || feature.properties.source["Hydro"]) && */feature.properties.capacity < 5000/* && knoxDistance < 400*/)
                 {
                    
                     return feature
@@ -143,44 +153,42 @@
 //                    return feature
 //                }
             },
-//                        geojson_layer.eachLayer(function (layer) {  
-//  if(layer.feature.properties.NAME == 'feature 1') {    
-//    layer.setStyle({fillColor :'blue'}) 
-//  }
-//});
+
                 onEachFeature: function(feature,layer) {
-                    if (feature.properties.source["Hydro"]){
-                        layer.setStyle(StyleHydro)
-                    }
-                    else if (feature.properties.source["Coal"]){
-                        layer.setStyle(StyleCoal)
-                    }
+//                    if (feature.properties.source["Hydro"]){
+//                        layer.setStyle(StyleHydro)
+//                    }
+//                    else if (feature.properties.source["Coal"]){
+//                        layer.setStyle(StyleCoal)
+//                    }
+                    
                     var props = feature.properties;
                     var content = "<b>"+props.plant_name+"<br>"+"Total Capacity: </b>"+props.capacity.toLocaleString()+" MW<br>";
-                    content2 = "This Plant is "+ knoxDistance +"<b> KM </b>"+"from Knoxville, TN.".toLocaleString();
+                    var content2 = "This Plant is "+ knoxDistance +"<b> KM </b>"+"from Knoxville, TN.".toLocaleString();
                     var fuelSource = props.source;
                     for(var fuel in fuelSource){
 //                        console.log(fuel, fuelSource[fuel]);
                        
                        content+=/*"<b>"+name+"<b/><br>"+*/"<b>"+fuel+"<b/>: "+fuelSource[fuel].toLocaleString()+" MW<br>";
-                         layer.bindPopup(content+content2);
+//                        console.log(content);
+                         layer.bindPopup(content);
 //                        console.log(knoxDistance)
                     }
-                    
-                    layer.on('mouseover', function() {
-                       layer.openPopup(),
-                        layer.setStyle(Style)
-                    })
-                    
-                        
-                    layer.on('mouseout', function() {
-                        if (feature.properties.source["Hydro"]){
-                        layer.setStyle(StyleHydro);
-                        }
-                        else{
-                            layer.setStyle(StyleCoal);
-                        };
-                    });
+//                    
+//                    layer.on('mouseover', function() {
+//                       layer.openPopup(),
+//                        layer.setStyle(Style)
+//                    })
+//                    
+//                        
+//                    layer.on('mouseout', function() {
+//                        if (feature.properties.source["Hydro"]){
+//                        layer.setStyle(StyleHydro);
+//                        }
+//                        else{
+//                            layer.setStyle(StyleCoal);
+//                        };
+//                    });
                 }
             }).addTo(map);
                     
@@ -196,10 +204,15 @@
 //      console.log(knoxDistance);
       return knoxDistance
         }
-function getRadius(val) {
-                var radius = Math.sqrt(val/Math.PI);
-                return radius * 1.1;   
-            }        
+//function getRadius(val) {
+//                var radius = Math.sqrt(val/Math.PI);
+//                return radius * 1.1;   
+//            }
+        function getSquare(val){
+            squareSide = Math.sqrt(val);
+            console.log();
+            return squareSide
+        }
         
     </script>
     

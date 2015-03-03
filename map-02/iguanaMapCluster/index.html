@@ -64,6 +64,9 @@
         <p>Purple Circle represents 400KM from Knoxville, TN</p>
         
     </footer>
+    <link rel="stylesheet" href="MarkerCluster.css"/>
+    <link rel="stylesheet" href="MarkerCluster.Default.css"/>
+    <script src="leaflet.markercluster-src.js"></script>
     <script src="power-plants-assignment.js"></script>
     <script>
         var map = L.map('map', {
@@ -100,21 +103,22 @@
         plants.features.sort(function(a,b) {
             return b.properties.capacity - a.properties.capacity;            
 		});
-        L.geoJson(plants, {
+        var markers = L.markerClusterGroup();
+        markers.addLayer(L.geoJson(plants, {
             pointToLayer: function(feature,latlng) {
                      var iguanaIcon = L.icon({
-                         iconUrl:'http://upload.wikimedia.org/wikipedia/commons/7/74/Farm-Fresh_chameleon.png',
-                         iconSize: [Math.sqrt(feature.properties.capacity), Math.sqrt(feature.properties.capacity)],
-                         iconAnchor: [20, 20],
-                         popupAnchor: [-3, -3],
+iconUrl:'http://upload.wikimedia.org/wikipedia/commons/7/74/Farm-Fresh_chameleon.png',
+    iconSize: [Math.sqrt(feature.properties.capacity), Math.sqrt(feature.properties.capacity)],
+    iconAnchor: [20, 20],
+    popupAnchor: [-3, -3],
                      })
-                     return L.marker(latlng, {icon: iguanaIcon})
+                 return L.marker(latlng, {icon: iguanaIcon})
             },
 //            filter: function(feature,layer) {
 //                if(feature.properties.capacity > 1000){
 //                    return feature
 //                }
-//           },
+//            },
             onEachFeature: function(feature,layer) {
                 var props = feature.properties;
                 var content = "<b>"+props.plant_name+"<br>"+"Total Capacity: </b>"+props.capacity.toLocaleString()+" MW<br>";
@@ -124,7 +128,8 @@
                         layer.bindPopup(content);
                 }
                 }
-            }).addTo(map);
+            }));
+  map.addLayer(markers);
         
     </script>
     

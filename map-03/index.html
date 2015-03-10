@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <title>Geo409 Map 02</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: whitesmoke;
+            font-family: Lato, sans-serif;
+            color: #0D0000;
+        }
+        header {
+            padding: 6px 10%;
+        }
+        h1 {
+            display: inline-block;
+            margin-right: 20px;
+            color: #001323;
+        }
+        h2 {
+            display: inline-block;
+            color: #001323;
+        }
+        #map {
+            width: 80%;
+            height: 540px;
+            margin: 10px auto;
+        }
+        footer {
+            padding: 6px 10%;
+            width: 80%;
+        }
+        p {
+            font-size: 1em;
+            color: #001323;
+        }
+    </style>
+
+</head>
+
+<body>
+    <header>
+        <h1>Map with Proportional Energy Production</h1>
+        <h2>Hydrolic and  Electrical Production within 400KM of Knoxville Tennessee/h2>
+    </header>
+
+    <div id='map'></div>
+
+    <footer>
+        <p>Map authored by Luke Victor</p>
+        <p>Purple Circle represents 400KM from Knoxville, TN</p>
+        <p> The gray circles represent capacity of energy production by coal.</p>
+        <p> The cyan circles with yellow interior represent capacity of energy production through hydro electric facilities.</p>
+        <p>Both gray and cyan circles size are proportional to the capacity of energy the plants can produce.</p>
+        
+    </footer>
+   
+<script src="power-plants-assignment.js"></script>
+<script>
+    var map = L.map('map', {
+        center: [40.000,-95.0000],
+        zoom: 4,
+        doubleClickZoom: false
+    });
+    var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+                               {attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+                                subdomains: 'abcd',
+                                minZoom: 0,
+                                maxZoom: 18
+                               });
+map.addLayer(tiles);
+    var layersGeoJson = {}
+    var spotLit /*= L.circle([0,0],0)*/;
+    var numClicks;
+    var totalSource = 0;
+    var layerInfo = {
+        hydroLayer: {b:"Hydro", color:'blue'},
+        windLayer: {b:"Wind", color:'lightBlue'},
+        natGasLayer: {b:"Natural Gas", color: 'pink'},
+//        nuculear: {source: "Nuclear", color: 'red'},
+//        coal:{spource: "Coal", color: 'black'},
+//        pumpedStorage:{source: "Pumped Storage",color:'orange'},
+//        biomass:{source:"Biomass",color:'green'},
+//        solar:{source:"solar",color:'yellow'},
+//        wood:{source:"Wood",color:'brown'},
+//        petrol:{source: "Petroleum", color: '#312a02'}
+    }
+    plants.features.sort(function(a,b) {
+        return b.properties.capacity - a.properties.capacity;
+    });
+    for(var layer in layerInfo){
+        layersGeoJson[layer]= L.geoJson(plants, {
+            pointToLayer: function(feature,latlng) {
+                return L.circleMarker(latlng, {
+                    weight: 5,
+                    stroke: 1,
+                    fillOpacity: .7,
+                    color: layerInfo[layer].color,
+                    fillColor: layerInfo[layer].color,
+                    radius: getRadius(feature.properties.source[layerInfo[layer].b]*.7)
+                });
+            },
+            filter: function(feature) {
+                if(feature.properties.source[layerInfo[layer].b]) {
+                    return feature;
+                }
+            },
+        });
+};
+    var sourcesLabels = {
+        "<b style='color:blue'>Hydro</b>": layersGeoJson.hydroLayer,
+        "<b style='color:lightBlue'>Wind</b>": layersGeoJson.windLayer,
+        "<b style='color:pink'>Natural Gas</b>": layersGeoJson.natGasLayer
+    };
+    L.control.layers(null, sourcesLabels, { collapsed:false}).addTo(map);
+    map.on('dblclick', function(e) {
+        var clickPos = e.latlng;
+        numClicks = 200;
+        turnt(clickPos,numClicks);
+    });
+    map.on('click', function(e) {
+        var clickPos = e.latlng;
+        numClicks = 500;
+        turnt(clickPos,numClicks);
+    });
+    //        FUNCTIONS
+    function turnt(clickPos,numClicks){
+        console.log(numClicks);
+        if(map.hasLayer(spotLit)){
+            map.removeLayer(spotLit);
+        }
+        spotLit = L.circle(clickPos,numClicks*1000,{
+            color: 'white',
+            fillcolor: 'white',
+            fillopacity: 1
+        }).addTo(map).bringToBack(map);
+        for(var layer in layerInfo) {
+            layersGeoJson[layer].eachLayer(function(layer) {
+                var distance = clickPos.distanceTo(layer.getLatLng())/1000;
+                if(distance > numClicks) {
+                    layer.setStyle({
+                        stroke: false,
+                        fill: false
+                    });
+                } else {
+                    layer.setStyle({
+                        stroke: true,
+                        fill: true
+                    });
+                    var content1 = "<b>"+layer.feature.properties.plant_name+"<br>Source: </b>";
+                    var plantInfo = layer.feature.properties.source;
+                    for (var fuel in plantInfo){
+                        content1 += fuel;
+                        if(fuel == "Hydro"){
+                            totalSource = totalSource+plantInfo[fuel];
+                            console.log(totalSource);
+                        }
+                    }
+                    layer.bindPopup(content1 +/*"other plant information*/" From Click "+distance.toLocaleString()+"km</b><br>"+" from the click point");
+                    layer.on('mouseover', function() {
+                        layer.openPopup()
+                    });
+                    layer.on('mouseout', function() {
+                        layer.closePopup()
+                    });
+                }
+            })
+        };
+    };
+    function getRadius(val) {
+        var radius = Math.sqrt(val/Math.PI);
+        var zoom = map.getZoom();
+        return radius * ((zoom^3)/(zoom+zoom+zoom))*1.4;
+    };
+</script>
+</body>
+</html>

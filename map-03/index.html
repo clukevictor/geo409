@@ -82,7 +82,8 @@ map.addLayer(tiles);
     var layersGeoJson = {}
     var spotLit /*= L.circle([0,0],0)*/;
     var numClicks;
-    var totalSource = 0;
+    var totalSource;
+    var source = 0;
     var layerInfo = {
         hydroLayer: {b:"Hydro", color:'blue'},
         windLayer: {b:"Wind", color:'lightBlue'},
@@ -162,9 +163,12 @@ map.addLayer(tiles);
                     for (var fuel in plantInfo){
                         content1 += fuel;
                         if(fuel == "Hydro"){
-                            totalSource = totalSource+plantInfo[fuel];
+                            source = source+plantInfo[fuel];
                             console.log(totalSource);
-                        }
+                            totalSource = source;
+                            console.log(totalSource);
+                        } 
+                            
                     }
                     layer.bindPopup(content1 +/*"other plant information*/" From Click "+distance.toLocaleString()+"km</b><br>"+" from the click point");
                     layer.on('mouseover', function() {
@@ -173,10 +177,12 @@ map.addLayer(tiles);
                     layer.on('mouseout', function() {
                         layer.closePopup()
                     });
-                }
-            })
+                    };
+                
+            });
         };
     };
+    
     function getRadius(val) {
         var radius = Math.sqrt(val/Math.PI);
         var zoom = map.getZoom();

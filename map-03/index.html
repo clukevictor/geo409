@@ -73,29 +73,29 @@
         doubleClickZoom: false
     });
     var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
-                               {attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
-                                subdomains: 'abcd',
-                                minZoom: 0,
-                                maxZoom: 18
-                               });
-map.addLayer(tiles);
+                            {attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+                             subdomains: 'abcd',
+                             minZoom: 0,
+                             maxZoom: 18
+                            });
+    map.addLayer(tiles);
     var layersGeoJson = {}
-    var spotLit /*= L.circle([0,0],0)*/;
+    var spotLit;
     var numClicks;
-    var totalSource;
-    var source = 0;
+    var sourcesLabels = {};
     var layerInfo = {
-        hydroLayer: {b:"Hydro", color:'blue'},
-        windLayer: {b:"Wind", color:'lightBlue'},
-        natGasLayer: {b:"Natural Gas", color: 'pink'},
-//        nuculear: {source: "Nuclear", color: 'red'},
-//        coal:{spource: "Coal", color: 'black'},
-//        pumpedStorage:{source: "Pumped Storage",color:'orange'},
-//        biomass:{source:"Biomass",color:'green'},
-//        solar:{source:"solar",color:'yellow'},
-//        wood:{source:"Wood",color:'brown'},
-//        petrol:{source: "Petroleum", color: '#312a02'}
-    }
+        layerHydro: {source:"Hydro", color:'blue'},
+        layerWind: {source:"Wind", color:'lightBlue'},
+        layerNatural_Gas: {source:"Natural_Gas", color:'pink'},
+        layerNuclear: {source: "Nuclear", color: 'red'},
+        layerCoal:{spource: "Coal", color: 'black'},
+        layerPumped_Storage:{source: "Pumped_Storage",color:'orange'},
+        layerBiomass:{source:"Biomass",color:'green'},
+        layerSolar:{source:"solar",color:'yellow'},
+        layerWood:{source:"Wood",color:'brown'},
+        LayerPetroleum:{source: "Petroleum", color: '#312a02'}
+    };
+    
     plants.features.sort(function(a,b) {
         return b.properties.capacity - a.properties.capacity;
     });
@@ -108,22 +108,16 @@ map.addLayer(tiles);
                     fillOpacity: .7,
                     color: layerInfo[layer].color,
                     fillColor: layerInfo[layer].color,
-                    radius: getRadius(feature.properties.source[layerInfo[layer].b]*.7)
+                    radius: getRadius(feature.properties.source[layerInfo[layer].source]*.7)
                 });
             },
             filter: function(feature) {
-                if(feature.properties.source[layerInfo[layer].b]) {
+                if(feature.properties.source[layerInfo[layer].source]) {
                     return feature;
                 }
             },
         });
-};
-    var sourcesLabels = {
-        "<b style='color:blue'>Hydro</b>": layersGeoJson.hydroLayer,
-        "<b style='color:lightBlue'>Wind</b>": layersGeoJson.windLayer,
-        "<b style='color:pink'>Natural Gas</b>": layersGeoJson.natGasLayer
     };
-    L.control.layers(null, sourcesLabels, { collapsed:false}).addTo(map);
     map.on('dblclick', function(e) {
         var clickPos = e.latlng;
         numClicks = 200;
@@ -145,9 +139,10 @@ map.addLayer(tiles);
             fillcolor: 'white',
             fillopacity: 1
         }).addTo(map).bringToBack(map);
+        var stats = {};
         for(var layer in layerInfo) {
             layersGeoJson[layer].eachLayer(function(layer) {
-                var distance = clickPos.distanceTo(layer.getLatLng())/1000;
+                var distance =clickPos.distanceTo(layer.getLatLng())/1000;
                 if(distance > numClicks) {
                     layer.setStyle({
                         stroke: false,
@@ -158,29 +153,40 @@ map.addLayer(tiles);
                         stroke: true,
                         fill: true
                     });
-                    var content1 = "<b>"+layer.feature.properties.plant_name+"<br>Source: </b>";
+                    var content1 ="<b>"+layer.feature.properties.plant_name+"<br>Source: </b>";
                     var plantInfo = layer.feature.properties.source;
                     for (var fuel in plantInfo){
                         content1 += fuel;
-                        if(fuel == "Hydro"){
-                            source = source+plantInfo[fuel];
-                            console.log(totalSource);
-                            totalSource = source;
-                            console.log(totalSource);
-                        } 
-                            
                     }
-                    layer.bindPopup(content1 +/*"other plant information*/" From Click "+distance.toLocaleString()+"km</b><br>"+" from the click point");
-                    layer.on('mouseover', function() {
+                    var props = layer.feature.properties;
+                    for (var source in props.source) {
+                        if(stats[source]) {
+                            stats[source]+=props.source[source];
+                        } else {
+                            stats[source] = props.source[source];
+                        }
+                    }
+                    layer.bindPopup(content1 + " From Click"+distance.toLocaleString()+"km</b><br>"+" from the click point");
+                                    layer.on('mouseover', function() {
                         layer.openPopup()
                     });
                     layer.on('mouseout', function() {
                         layer.closePopup()
                     });
-                    };
-                
+                };
             });
         };
+        var statsContent = '';
+        for(var stat in stats) {
+            statsContent+="<b>"+stat+":</b> "+stats[stat].toLocaleString()+" MW<br>"
+            var layerStat = "layer"+stat;
+            console.log(layerStat);
+            sourcesLabels[stat] = layersGeoJson.layerStat;
+            console.log(sourcesLabels)
+            console.log(layersGeoJson.layerstat);
+            spotLit.bindPopup(statsContent)
+        };
+    spotLit.openPopup();
     };
     
     function getRadius(val) {
@@ -188,7 +194,9 @@ map.addLayer(tiles);
         var zoom = map.getZoom();
         return radius * ((zoom^3)/(zoom+zoom+zoom))*1.4;
     };
-//b;op
+    //b;op
+    L.control.layers(null, sourcesLabels, {
+        collapsed:false}).addTo(map);
 </script>
 </body>
 </html>

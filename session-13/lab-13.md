@@ -144,8 +144,6 @@ For now, we'll arbitrarily assign a couple values to these latter variables. In 
             }          
         }).addTo(map);
 
-        drawMap();
-
     });
 ```
 
@@ -289,7 +287,7 @@ To make a legend, we'll be using a technique modified from a [tutorial](http://l
                 // an <i> tag styled with the color and include the range values
                 // of that particular classification group
                 div.innerHTML +=
-                    '<li><i style="background:' + color + '"></i> ' +
+                    '<li><span style="background:' + color + '"></span> ' +
                     (breaks[i]*100).toLocaleString() + ' &mdash; ' + 
                     (breaks[i + 1]*100).toLocaleString() + '</li>';
             }

@@ -82,7 +82,6 @@
     var layersGeoJson = {}
     var spotLit;
     var numClicks;
-    var sourcesLabels = {};
     var layerInfo = {
         layerHydro: {source:"Hydro", color:'blue'},
         layerWind: {source:"Wind", color:'lightBlue'},
@@ -179,11 +178,11 @@
         var statsContent = '';
         for(var stat in stats) {
             statsContent+="<b>"+stat+":</b> "+stats[stat].toLocaleString()+" MW<br>"
-            var layerStat = "layer"+stat;
-            console.log(layerStat);
-            sourcesLabels[stat] = layersGeoJson.layerStat;
-            console.log(sourcesLabels)
-            console.log(layersGeoJson.layerstat);
+//            var layerStat = "layer"+stat;
+//            console.log(layerStat);
+//            
+//            console.log(sourcesLabels)
+//            console.log(layersGeoJson.layerstat);
             spotLit.bindPopup(statsContent)
         };
     spotLit.openPopup();
@@ -195,8 +194,13 @@
         return radius * ((zoom^3)/(zoom+zoom+zoom))*1.4;
     };
     //b;op
-    L.control.layers(null, sourcesLabels, {
-        collapsed:false}).addTo(map);
+   var sourcesLabels = {
+            "Hydro": layersGeoJson.hydroLayer,
+            "Wind": layersGeoJson.windLayer,
+            "Solar": layersGeoJson.solarLayer
+        }
+
+        L.control.layers(null, sourcesLabels, { collapsed:false }).addTo(map);
 </script>
 </body>
 </html>

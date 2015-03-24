@@ -87,12 +87,12 @@
         layerWind: {source:"Wind", color:'lightBlue'},
         layerNatural_Gas: {source:"Natural_Gas", color:'pink'},
         layerNuclear: {source: "Nuclear", color: 'red'},
-        layerCoal:{spource: "Coal", color: 'black'},
+        layerCoal:{source: "Coal", color: 'lightGreen'},
         layerPumped_Storage:{source: "Pumped_Storage",color:'orange'},
         layerBiomass:{source:"Biomass",color:'green'},
-        layerSolar:{source:"solar",color:'yellow'},
-        layerWood:{source:"Wood",color:'brown'},
-        LayerPetroleum:{source: "Petroleum", color: '#312a02'}
+        layerSolar:{source:"Solar",color:'yellow'},
+        layerWood:{source:"Wood",color:'purple'},
+        LayerPetroleum:{source: "Petroleum", color: '#f4d005'}
     };
     
     plants.features.sort(function(a,b) {
@@ -194,13 +194,12 @@
         return radius * ((zoom^3)/(zoom+zoom+zoom))*1.4;
     };
     //b;op
-   var sourcesLabels = {
-            "Hydro": layersGeoJson.hydroLayer,
-            "Wind": layersGeoJson.windLayer,
-            "Solar": layersGeoJson.solarLayer
-        }
-
+   var sourcesLabels = {}
+   for(layer in layerInfo){
+   sourcesLabels[layerInfo[layer].source] = layersGeoJson[layer]
+   }
         L.control.layers(null, sourcesLabels, { collapsed:false }).addTo(map);
+   
 </script>
 </body>
 </html>

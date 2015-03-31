@@ -123,6 +123,7 @@
     var map = L.map('map', options);
 //    variable for accessing info in properties section in the geoJSON ky_counties_housing
     var labels = {
+"VACANT": "vacant housing units, out of TOTAL",
 "VACANT_FOR": "vacant units for rent",
 "VACANT_REN": "vacant units, rented not occupied",
 "VACANT_FO2": "vacant units, for sale only",
@@ -143,7 +144,9 @@
         norm = "VACANT";
     
 //    Creates layers of shapefiles (counties) in geoJson format so can be manipulated in leaflet
+    //console.log("khkhk")
     $.getJSON("ky_counties_housing.json", function(data) {/*ask about dollar sign-only in jQuery?*/
+        console.log("fddfd")
         dataLayer = L.geoJson(data, {
             style: function(feature) {
                 return {
@@ -154,6 +157,7 @@
                 };
             }          
         }).addTo(map);
+        console.log(dataLayer);
         ui();
 //        calls all initial functions (no user interaction-yet);
         drawLegend();
@@ -163,10 +167,12 @@
 //    function that populates the map element of the page
     function drawMap() {
         var breaks = getClassBreaks();
+        console.log(breaks)
         dataLayer.eachLayer(function(layer) {
             var props = layer.feature.properties;
+            var color = getColor(props[attribute]/props[norm], breaks)
             layer.setStyle({
-                fillColor: getColor(props[attribute]/props[norm], breaks)
+                fillColor: color
             });
             layer.bindPopup("<b>"+layer.feature.properties["NAME"]+" County</b></br>" +
                             labels[attribute] + ": " + ((layer.feature.properties[attribute]/
@@ -178,12 +184,14 @@
 //            returns to initial color (actually not changing exactly back
             layer.on('mouseout',function(){
                layer.setStyle({
-                fillColor: getColor(props[attribute]/props[norm], breaks)
+                fillColor: color,
+                fillOpacity: 1
             });
         });
 //        updates map based on user selection of data type in drop down menu
-        updateLegend(breaks); 
+        
         });
+        updateLegend(breaks); 
     }
 //    Runs simple statistics to determine breaks 
     function getClassBreaks() {
@@ -267,7 +275,13 @@
     //    populates in the mapover section of the drawMap function and is the creation of the text through html and extracting raw data from json file.
     function updateInfo(layer) {
         var props = layer.feature.properties;
-        var html = "<h3>"+props['NAME']+" County</h3>"+
+//        var vacancyLables ={};
+//        for(vacancy in labels){
+//            vacancyLables[labels[vacancy]] = dataLayer[vacancy]
+//        }
+//        console.log(vacancyLables);
+        var html = "<h3>"+props['NAME']+" County</h3>"+props
+            
             "total # vancant units: <b>"+ props["VACANT"]+"</b><br>"+
             "# vacant for rent  <b>"+ props["VACANT_FOR"]+"</b><br>"+
             "# vacant units for rent: <b>"+ props["VACANT_REN"]+"</b><br>"+"# Vacant units, rented not occupied: <b>"+ props["VACANT_REN"]+"</b>"

@@ -5,7 +5,7 @@
     <meta charset=utf-8 />
     <title>Task J starter template</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-
+<!--As far as standard practice, is this where we are normally supposed to load scripts as opposed to beginning of java coded section?-->
     <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     <script src="simple_statistics.js"></script>
@@ -75,6 +75,15 @@
         .leaflet-popup-content {
             max-width: 160px;   
         }
+        .info {
+        
+        padding: 6px 8px;
+        font-size: 1em;
+        background: rgba(255,255,255,0.8);
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        border-radius: 5px;
+        text-align: right;   
+    }
         
     </style>
 </head>
@@ -84,7 +93,15 @@
         <h1>Map Title</h1>
         <h2>Map Subtitle</h2>
     </header>
-
+<div id='ui-controls'>
+<label>Choose a data attribute:<br>
+<select name="occupied"><!--??? do not understand this-->
+<option value="OWNED_MORT" selected>owned with mortgage</option>
+<option value="OWNED_FREE">owned free and clear</option> 
+<option value="RENTER">rented</option>
+</select>
+</label>
+</div>
     <div id='map'></div>
 
     <footer>
@@ -94,117 +111,153 @@
         </p>
     </footer>
 
-    <script>
-        
-        var options = {
-            center: [38.2, -85.8],
-            zoom: 7.4,
-            minZoom: 7.4,
-            maxZoom: 7.4,
-            dragging: false,
-            zoomControl: false
-        }
-        var map = L.map('map', options);
-        
-        // Begin module 13 code here
-        
-        var dataLayer,
-            attribute = "OWNED_MORT",
-            norm = "OCCUPIED";
-        
-        $.getJSON("ky_counties_housing.json", function(data) {
-            
-            dataLayer = L.geoJson(data, {
-                 style: function(feature) {
-                    return {
-                            color: '#dddddd',
-                            weight: 2,
-                            fillOpacity: 1,
-                            fillColor: '#1f78b4'
-                        };
-                }          
-            }).addTo(map);
-            
-            drawMap();
-              
-        });
-        
-        function drawMap() {
-            
-            var breaks = getClassBreaks();
-
-            dataLayer.eachLayer(function(layer) {
-                
-                var props = layer.feature.properties;
-                
-                layer.setStyle({
-                    fillColor: getColor(props[attribute]/
-                                        props[norm], breaks)
-                });
-                layer.bindPopup("<b>"+props["NAME"]+" County</b></br>" +
-                                attribute + ": " +
-                                ((props[attribute]/props[norm])*100).toLocaleString());  
-            });
-            
-            drawLegend(breaks);
-        }
-        
-        function getClassBreaks() {
-            
-            var values = [];
-            
-            dataLayer.eachLayer(function(layer) {
-                var value = layer.feature.properties[attribute]/layer.feature.properties[norm];
-                values.push(value);   
-            }); 
-            
-            var breaks = ss.jenks(values, 5);
-            return breaks;
-            
-        }   
-        
-        function getColor(d, breaks) {
-            if(d <= breaks[1]) {
-                return '#f1eef6';
-            } else if(d <= breaks[2]) {
-                return '#bdc9e1';
-            } else if(d <= breaks[3]) {
-                return '#74a9cf';
-            } else if(d <= breaks[4]) {
-                return '#2b8cbe'
-            } else if(d <= breaks[5]) {
-                return '#045a8d'
-            }
-        }
-        
-        function drawLegend(breaks) {
-            
-            var legend = L.control({position: 'topleft'});
-
-            legend.onAdd = function (map) {
-                
-                var div = L.DomUtil.create('div', 'legend');
-                
-                div.innerHTML = "<h3>" + attribute + " per " + norm + "</h3><ul>"; 
-
-                for (var i = 0; i < breaks.length-1; i++) {
-                    var color = getColor(breaks[i + 1], breaks);
-                    div.innerHTML +=
-                        '<li><span style="background:' + color + '"></span> ' +
-                        (breaks[i]*100).toLocaleString() + ' &mdash; ' + 
-                        (breaks[i + 1]*100).toLocaleString() + '</li>';
-                }
-                div.innerHTML += "</ul>"
-                return div;
-                
-                    
-            };
-
-            legend.addTo(map);
-        }
-
-    </script>
+<script>
+    var options = {
+        center: [38.2, -85.8],
+        zoom: 7.4,
+        minZoom: 7.4,
+        maxZoom: 7.4,
+        dragging: false,
+        zoomControl: false
+    }
+    var map = L.map('map', options);
+    var labels = {
+        "OCCUPIED": "occupied units",
+        "OWNED_MORT": "% occupied housing units owned with mortgage",
+        "OWNED_FREE": "% occupied housing units owned free and clear",
+        "RENTER": "% occupied housing units rented"   
+    }
+//   style for mouseover
+    var style = {
+        color: 'yellow',
+        fillColor: 'yellow',
+        fillOpacity: .7
+    }
+    // Begin module 13 code here
+    var dataLayer,
+        attribute = "OWNED_MORT",
+        norm = "OCCUPIED";
     
-</body>
-
+//    Creates layers of shapefiles (counties) in geoJson format so can be manipulated in leaflet
+    $.getJSON("ky_counties_housing.json", function(data) {/*ask about dollar sign-only in jQuery?*/
+        dataLayer = L.geoJson(data, {
+            style: function(feature) {
+                return {
+                    color: '#dddddd',
+                    weight: 2,
+                    fillOpacity: 1,
+                    fillColor: '#1f78b4'
+                };
+            }          
+        }).addTo(map);
+        ui();
+//        calls all initial functions (no user interaction-yet);
+        drawLegend();
+        drawMap();
+        drawInfo(); /*why does legend show up if draw info after draw map, but not before?*/
+    });
+    function drawMap() {
+        var breaks = getClassBreaks();
+        dataLayer.eachLayer(function(layer) {
+            var props = layer.feature.properties;
+            layer.setStyle({
+                fillColor: getColor(props[attribute]/props[norm], breaks)
+            });
+            layer.bindPopup("<b>"+layer.feature.properties["NAME"]+" County</b></br>" +
+                            labels[attribute] + ": " + ((layer.feature.properties[attribute]/
+                                                         layer.feature.properties[norm])*100).toLocaleString()); 
+              layer.on('mouseover', function() { /*highlites county and provides raw data in info frame*/
+                  layer.setStyle(style);
+                  updateInfo(this);
+              });
+//            returns to initial color (actually not changing exactly back
+            layer.on('mouseout',function(){
+               layer.setStyle({
+                fillColor: getColor(props[attribute]/props[norm], breaks)
+            });
+        });
+//        updates map based on user selection of data type in drop down menu
+        updateLegend(breaks); 
+        });
+    }
+//    Runs simple statistics to determine breaks 
+    function getClassBreaks() {
+        var values = [];
+        dataLayer.eachLayer(function(layer) {
+            var value = layer.feature.properties[attribute]/layer.feature.properties[norm];
+            values.push(value);
+          
+        }); 
+        var breaks = ss.jenks(values, 5);
+        return breaks;
+    }
+//    attaches color to specific breaks
+    function getColor(d, breaks) {
+        if(d <= breaks[1]) {
+            return '#f1eef6';
+        } else if(d <= breaks[2]) {
+            return '#bdc9e1';
+        } else if(d <= breaks[3]) {
+            return '#74a9cf';
+        } else if(d <= breaks[4]) {
+            return '#2b8cbe'
+        } else if(d <= breaks[5]) {
+            return '#045a8d'
+        }
+    }
+//    creates the legend using a leaflet control though I am a bit confused with how this actual works and the domutility
+    function drawLegend() {
+        var legend = L.control({position: 'topleft'});
+        legend.onAdd = function(map) {
+            var div = L.DomUtil.create('div', 'legend');
+            return div;
+        };
+        legend.addTo(map);
+    }
+//    updates legend when user selects different data from drop down menu
+    function updateLegend(breaks) {
+        var legend = $('.legend').html("<h3>" + labels[attribute] + "</h3><ul>");
+        for (var i = 0; i < breaks.length-1; i++) {
+            var color = getColor(breaks[i + 1], breaks);
+            legend.append('<li><span style="background:' + color + '"></span> ' +
+                          (breaks[i]*100).toLocaleString() + ' &mdash; ' + 
+                          (breaks[i + 1]*100).toLocaleString() + '</li>');
+        }
+        legend.append("</ul>");
+    }
+    function ui(){
+        var dataView = L.control({position: 'topleft'});
+        //.onAdd? is this creating an object from annymous function
+        dataView.onAdd = function(map) {
+            var controls = L.DomUtil.get('ui-controls');
+            return controls;
+        }
+        dataView.addTo(map);
+        $('select[name="occupied"]').change(function() {
+            attribute = $(this).val();
+            drawMap();
+        });
+    }
+    function drawInfo() {
+        var info = L.control({position: 'topright'});
+        info.onAdd = function(map) {
+            var div = L.DomUtil.create('div', 'info');
+       
+            return div;  
+        }
+        info.addTo(map);
+        var html = "<h3><b>Mouse over counties for detailed information</b></h3>"
+        $(".info").html(html);
+    }
+    function updateInfo(layer) {
+        var props = layer.feature.properties;
+        var html = "<h3>"+props['NAME']+" County</h3>"+
+            "total # occupied units: <b>"+ props["OCCUPIED"]+"</b><br>"+
+            "# owned with mortgage or loan: <b>"+ props["OWNED_MORT"]+"</b><br>"+
+            "# owned free and clear: <b>"+ props["OWNED_FREE"]+"</b><br>"+
+            "# occupied by renters: <b>"+ props["RENTER"]+"</b>"
+        $(".info").html(html);
+    }
+    </script>
+    </body>
 </html>

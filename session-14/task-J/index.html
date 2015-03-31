@@ -5,7 +5,7 @@
     <meta charset=utf-8 />
     <title>Task J starter template</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-
+<!--As far as standard practice, is this where we are normally supposed to load scripts as opposed to beginning of java coded section?-->
     <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     <script src="simple_statistics.js"></script>
@@ -75,136 +75,204 @@
         .leaflet-popup-content {
             max-width: 160px;   
         }
+/*       provides style features of the "info" table on teh right side of the map.*/
+        .info {
+        padding: 6px 8px;
+        font-size: 1em;
+        background: rgba(255,255,255,0.8);
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        border-radius: 5px;
+        text-align: right;   
+    }
         
     </style>
 </head>
 
 <body>
     <header>
-        <h1>Map Title</h1>
-        <h2>Map Subtitle</h2>
+        <h1>Kentucky Housing:</h1>
+        <h2>Characteristics of Vacancy in Kentucky Housing</h2>
     </header>
-
+    <!--Creates the drop down menu and provides options there within-->
+    <div id='ui-controls'>
+        <label>Choose a data attribute:<br>
+            <select name="VACANT"><!--??? do not understand this-->
+                <option value="VACANT_FOR" selected>vacant units for rent</option>
+                <option value="VACANT_REN">vancant units, rented not occupied</option>
+                <option value="VACANT_FOR">vacant units, for sale only</option>
+            </select>
+        </label>
+    </div>
     <div id='map'></div>
-
+    
     <footer>
-        <p>Map authored by YOUR NAME</p>
-        <p>Additional information about the data and map goes here.</p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis urna magna, maximus nec laoreet sit amet, dictum ultricies nibh. Ut id auctor lacus. Nam a dolor et justo luctus luctus. Duis a elit eget risus dictum vehicula id eu elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed sed enim nisl. Vestibulum commodo imperdiet lacus, sed facilisis erat placerat sit amet. Nulla consequat malesuada neque eget aliquet. Integer non convallis nisl, gravida ultrices ex. Fusce nec vestibulum elit. Sed elementum lectus ipsum, vulputate elementum ex laoreet a. Aenean eu ex varius, varius felis vitae, efficitur nulla. Quisque pretium laoreet ante, in sodales dui vehicula at. Mauris eu sem sapien.
-        </p>
+        <p>Map authored by Luke Victor</p>
+        <p>The data displays information about Kentucky housing in relation to vacant houses and causes for such vacancies</p>
+        <p></p>
     </footer>
 
-    <script>
-        
-        var options = {
-            center: [38.2, -85.8],
-            zoom: 7.4,
-            minZoom: 7.4,
-            maxZoom: 7.4,
-            dragging: false,
-            zoomControl: false
-        }
-        var map = L.map('map', options);
-        
-        // Begin module 13 code here
-        
-        var dataLayer,
-            attribute = "OWNED_MORT",
-            norm = "OCCUPIED";
-        
-        $.getJSON("ky_counties_housing.json", function(data) {
-            
-            dataLayer = L.geoJson(data, {
-                 style: function(feature) {
-                    return {
-                            color: '#dddddd',
-                            weight: 2,
-                            fillOpacity: 1,
-                            fillColor: '#1f78b4'
-                        };
-                }          
-            }).addTo(map);
-            
-            drawMap();
-              
-        });
-        
-        function drawMap() {
-            
-            var breaks = getClassBreaks();
-
-            dataLayer.eachLayer(function(layer) {
-                
-                var props = layer.feature.properties;
-                
-                layer.setStyle({
-                    fillColor: getColor(props[attribute]/
-                                        props[norm], breaks)
-                });
-                layer.bindPopup("<b>"+props["NAME"]+" County</b></br>" +
-                                attribute + ": " +
-                                ((props[attribute]/props[norm])*100).toLocaleString());  
-            });
-            
-            drawLegend(breaks);
-        }
-        
-        function getClassBreaks() {
-            
-            var values = [];
-            
-            dataLayer.eachLayer(function(layer) {
-                var value = layer.feature.properties[attribute]/layer.feature.properties[norm];
-                values.push(value);   
-            }); 
-            
-            var breaks = ss.jenks(values, 5);
-            return breaks;
-            
-        }   
-        
-        function getColor(d, breaks) {
-            if(d <= breaks[1]) {
-                return '#f1eef6';
-            } else if(d <= breaks[2]) {
-                return '#bdc9e1';
-            } else if(d <= breaks[3]) {
-                return '#74a9cf';
-            } else if(d <= breaks[4]) {
-                return '#2b8cbe'
-            } else if(d <= breaks[5]) {
-                return '#045a8d'
-            }
-        }
-        
-        function drawLegend(breaks) {
-            
-            var legend = L.control({position: 'topleft'});
-
-            legend.onAdd = function (map) {
-                
-                var div = L.DomUtil.create('div', 'legend');
-                
-                div.innerHTML = "<h3>" + attribute + " per " + norm + "</h3><ul>"; 
-
-                for (var i = 0; i < breaks.length-1; i++) {
-                    var color = getColor(breaks[i + 1], breaks);
-                    div.innerHTML +=
-                        '<li><span style="background:' + color + '"></span> ' +
-                        (breaks[i]*100).toLocaleString() + ' &mdash; ' + 
-                        (breaks[i + 1]*100).toLocaleString() + '</li>';
-                }
-                div.innerHTML += "</ul>"
-                return div;
-                
-                    
-            };
-
-            legend.addTo(map);
-        }
-
-    </script>
+<script>
+    var options = {
+        center: [38.2, -85.8],
+        zoom: 7.4,
+        minZoom: 7.4,
+        maxZoom: 7.4,
+        dragging: false,
+        zoomControl: false
+    }
+    var map = L.map('map', options);
+//    variable for accessing info in properties section in the geoJSON ky_counties_housing
+    var labels = {
+"VACANT_FOR": "vacant units for rent",
+"VACANT_REN": "vacant units, rented not occupied",
+"VACANT_FO2": "vacant units, for sale only",
+"VACANT_SOL": "vacant units, sole not occupied",
+"VACANT_SEA": "vacant units used seasonally or for recreational use only",
+"VACANT_MIG": "vacant units used for migratory workers",
+"VACANT_OTH": "vacant units, other"
+    }
+//   style for mouseover
+    var style = {
+        color: 'yellow',
+        fillColor: 'yellow',
+        fillOpacity: .7
+    }
+    // Begin module 13 code here
+    var dataLayer,
+        attribute = "VACANT_FOR",
+        norm = "VACANT";
     
-</body>
+//    Creates layers of shapefiles (counties) in geoJson format so can be manipulated in leaflet
+    $.getJSON("ky_counties_housing.json", function(data) {/*ask about dollar sign-only in jQuery?*/
+        dataLayer = L.geoJson(data, {
+            style: function(feature) {
+                return {
+                    color: '#dddddd',
+                    weight: 2,
+                    fillOpacity: 1,
+                    fillColor: '#1f78b4'
+                };
+            }          
+        }).addTo(map);
+        ui();
+//        calls all initial functions (no user interaction-yet);
+        drawLegend();
+        drawMap();
+        drawInfo(); /*why does legend show up if draw info after draw map, but not before?*/
+    });
+//    function that populates the map element of the page
+    function drawMap() {
+        var breaks = getClassBreaks();
+        dataLayer.eachLayer(function(layer) {
+            var props = layer.feature.properties;
+            layer.setStyle({
+                fillColor: getColor(props[attribute]/props[norm], breaks)
+            });
+            layer.bindPopup("<b>"+layer.feature.properties["NAME"]+" County</b></br>" +
+                            labels[attribute] + ": " + ((layer.feature.properties[attribute]/
+                                                         layer.feature.properties[norm])*100).toLocaleString()); 
+              layer.on('mouseover', function() { /*highlites county and provides raw data in info frame*/
+                  layer.setStyle(style);
+                  updateInfo(this);
+              });
+//            returns to initial color (actually not changing exactly back
+            layer.on('mouseout',function(){
+               layer.setStyle({
+                fillColor: getColor(props[attribute]/props[norm], breaks)
+            });
+        });
+//        updates map based on user selection of data type in drop down menu
+        updateLegend(breaks); 
+        });
+    }
+//    Runs simple statistics to determine breaks 
+    function getClassBreaks() {
+        var values = [];
+        dataLayer.eachLayer(function(layer) {
+            var value = layer.feature.properties[attribute]/layer.feature.properties[norm];
+            values.push(value);
+          
+        }); 
+        var breaks = ss.jenks(values, 5);
+        return breaks;
+    }
+//    attaches color to specific breaks
+    function getColor(d, breaks) {
+        if(d <= breaks[1]) {
+            return '#f1eef6';
+        } else if(d <= breaks[2]) {
+            return '#bdc9e1';
+        } else if(d <= breaks[3]) {
+            return '#74a9cf';
+        } else if(d <= breaks[4]) {
+            return '#2b8cbe'
+        } else if(d <= breaks[5]) {
+            return '#045a8d'
+        }
+    }
 
+    //    creates the legend using a leaflet control though I am a bit confused with how this actual works and the domutility
+    function drawLegend() {
+        var legend = L.control({position: 'topleft'});
+        legend.onAdd = function(map) {
+            var div = L.DomUtil.create('div', 'legend');
+            return div;
+        };
+        legend.addTo(map);
+    }
+
+    //    updates legend when user selects different data from drop down menu
+    function updateLegend(breaks) {
+        var legend = $('.legend').html("<h3>" + labels[attribute] + "</h3><ul>");
+        for (var i = 0; i < breaks.length-1; i++) {
+            var color = getColor(breaks[i + 1], breaks);
+            legend.append('<li><span style="background:' + color + '"></span> ' +
+                          (breaks[i]*100).toLocaleString() + ' &mdash; ' + 
+                          (breaks[i + 1]*100).toLocaleString() + '</li>');
+        }
+        legend.append("</ul>");
+    }
+
+    //    user interface, creates drop down controls. know that it also creates a thingy that so the computer knows what it selected, but I am unsure of what this is/looks like.
+    function ui(){
+        var dataView = L.control({position: 'topleft'});
+        //.onAdd? is this creating an object from annymous function
+        dataView.onAdd = function(map) {
+            var controls = L.DomUtil.get('ui-controls');
+            return controls;
+        }
+        dataView.addTo(map);
+        $('select[name="VACANT"]').change(function() {
+            attribute = $(this).val();
+            drawMap();
+            
+        });
+    }
+
+    //    Creates table of raw data and provides initial message
+    function drawInfo() {
+        var info = L.control({position: 'topright'});
+        info.onAdd = function(map) {
+            var div = L.DomUtil.create('div', 'info');
+       
+            return div;  
+        }
+        info.addTo(map);
+        var html = "<h3><b>Mouse over counties for detailed information</b></h3>"
+        $(".info").html(html);
+    }
+
+    
+    
+    //    populates in the mapover section of the drawMap function and is the creation of the text through html and extracting raw data from json file.
+    function updateInfo(layer) {
+        var props = layer.feature.properties;
+        var html = "<h3>"+props['NAME']+" County</h3>"+
+            "total # vancant units: <b>"+ props["VACANT"]+"</b><br>"+
+            "# vacant for rent  <b>"+ props["VACANT_FOR"]+"</b><br>"+
+            "# vacant units for rent: <b>"+ props["VACANT_REN"]+"</b><br>"+"# Vacant units, rented not occupied: <b>"+ props["VACANT_REN"]+"</b>"
+        $(".info").html(html);
+    }
+    </script>
+    </body>
 </html>

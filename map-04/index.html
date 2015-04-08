@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <title>Module 15 Lab Template</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.0/papaparse.min.js"></script>
+    <script src="simple_statistics.js"></script>
+
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+
+    <style>
+        h1 {
+            position: absolute;
+            z-index: 100;
+            top: 10px;
+            left: 60px;
+            padding: 8px 15px;
+            margin: 0;
+            color: whitesmoke;
+            font-size: 1.5em;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 5px;
+        }
+        
+        #map {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        
+        .legend {
+            padding: 6px 8px;
+            font-size: 1em;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+        
+        .legend h3 {
+            padding: 6px 8px;
+            font-size: 1.1em;
+            font-weight: normal;
+            color: #001323;
+            margin: 0;
+        }
+        
+        .legend li {
+            list-style-type: none;
+            height: 22px;
+        }
+        
+        .legend span {
+            width: 20px;
+            height: 20px;
+            float: left;
+            margin-right: 10px;
+        }
+        
+        .leaflet-popup-content {
+            max-width: 180px;
+        }
+        
+        #ui-controls {
+            width: 176px;
+            padding: 8px 15px 8px 15px;
+            background: rgba(75, 75, 75, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            color: whitesmoke;
+        }
+        
+        #ui-controls .min {
+            float: left;
+        }
+        
+        #ui-controls .max {
+            float: right;
+        }
+        
+        .year-slider {
+            width: 100%;
+        }
+        .info {
+            padding: 6px 8px;
+            font-size: 1em;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            text-align: center;
+    </style>
+</head>
+<!--_______________________________________________________________________________-->
+
+<body>
+    <h1>Kentucky Unemployment Rates by County</h1>
+    <div id="ui-controls">
+        <label><span class="min">2000</span><span class="max">2013</span>
+            <input type="range" min="2000" , max="2013" , value="2000" , step="1" , class="year-slider"></input>
+        </label>
+    </div>
+    <div id='map'></div>
+    <script>
+        var countyDataLayer,
+            year = "2000";
+        var options = {
+            center: [38.2, -85.8],
+            zoom: 7.4,
+            minZoom: 7.4,
+            maxZoom: 7.4,
+            dragging: false,
+            zoomControl: false
+        }
+        var style = {
+            color: 'yellow',
+            fillColor: 'yellow',
+        }
+        var map = L.map('map', options);
+        var counties;
+        //
+        $.getJSON("ky-counties.json", function (counties) {
+            Papa.parse('ky-unemployment-data.csv', {
+                download: true,
+                header: true,
+                complete: function (data) {
+                    //                    calls function to process data
+                    processData(counties, data);
+                    //                    creating geoJson layers of ky counties
+                    countyDataLayer = L.geoJson(counties, {
+                        style: function (feature) {
+                            return {
+                                color: 'black',
+                                weight: 2,
+                                fillOpacity: 1,
+                                fillColor: 'white'
+                            };
+                        }
+                    }).addTo(map);
+                    ui();
+
+                    drawLegend();
+                    drawMap();
+                    drawInfo();
+                    createSliderUI();
+                }
+            })
+        });
+        $('select[name="unemployment"]').change(function () {
+            year = $(this).val();
+            drawMap();
+
+        });
+        $(".year-slider")
+            .on('input change', function () {
+                year = $(this).val();
+                drawMap();
+            })
+            //        Processing data by combining unemployment info with shapefiles
+        function processData(counties, data) {
+            for (var county in counties.features) {
+                var props = counties.features[county].properties;
+                for (var d in data.data) {
+                    if (props.COUNTY_FIP == data.data[d].CNTY) {
+                        counties.features[county].properties = data.data[d];
+                        break;
+                    }
+                }
+            }
+        };
+        //
+        function drawMap() {
+                var breaks = getClassBreaks();
+                countyDataLayer.eachLayer(function (layer) {
+                    var properties = layer.feature.properties;
+                    var color =  getBreakColor(properties[year], breaks)
+                    layer.setStyle({
+                        fillColor: color,
+                        color: 'black'
+                    });
+                    layer.bindPopup("<b>" + properties.NAME + " County</b><br>" + year + "'s Unemployment Rate: " + properties[year]);
+                    layer.on('click', function () {
+                        layer.openPopup();
+                    })
+                    layer.on('mouseover', function () { /*highlites county and provides raw data in info frame*/
+                        layer.setStyle(style);
+                        updateInfo(this);
+                    });
+                    //            returns to initial color (actually leaves yellow outline as trace of which counties you've looked at
+                    layer.on('mouseout', function () {
+                        layer.setStyle({
+                            fillColor: color,
+                            color: 'black'
+                        });
+                    });
+                })
+                updateLegend(breaks);
+            }
+            //
+        function getClassBreaks() {
+            var breakPoints = [];
+            countyDataLayer.eachLayer(function (layer) {
+                var value = Number(layer.feature.properties[year]);
+                breakPoints.push(value);
+            })
+            var breaks = ss.quantile(breakPoints, [0, 0.2, 0.4, 0.6, 0.8, 1]);
+            return breaks
+        };
+        //
+        function getBreakColor(d, breaks) {
+                var color = ['rgb(237,248,251)', 'rgb(204,236,230)', 'rgb(153,216,201)', 'rgb(102,194,164)', 'rgb(44,162,95)', 'rgb(0,109,44)'];
+                for (i = 0; i < 5; i++) {
+                    if (d <= breaks[i + 1]) {
+                        return color[i]
+                    } else {}
+                }
+            }
+            //
+        function ui() {
+            dataView = L.control({
+                position: 'bottomleft'
+            });
+            dataView.onAdd = function (map) {
+                var controls = L.DomUtil.get('ui-controls');
+                return controls
+            }
+            dataView.addTo(map);
+        }
+
+        //
+        function drawLegend() {
+                var legend = L.control({
+                    position: 'topright'
+                });
+                legend.onAdd = function (map) {
+                    var div = L.DomUtil.create('div', 'legend');
+                    return div;
+                };
+                legend.addTo(map);
+            }
+            //
+        function updateLegend(breaks) {
+            var legend = $('.legend').html("<h3>Unemployment in " + year + "</h3.,ul>");
+            console.log(legend)
+            for (var i = 0; i < breaks.length - 1; i++) {
+                var coloring = getBreakColor(breaks[i], breaks);
+                legend.append('<li><span style="background:' + coloring + '"></span>' + (breaks[i]).toLocaleString() + ' &mdash; ' + (breaks[i + 1]).toLocaleString() + "%" + '</li>');
+            }
+            legend.append("<ul>");
+        };
+        //
+        function createSliderUI() {
+            var sliderControl = L.control({
+                position: 'bottomright'
+            });
+            sliderControl.onAdd = function (map) {
+                var slider = L.DomUtil.get("ui-controls");
+                L.DomEvent.addListener(slider, 'mousedown', function (e) {
+                    L.DomEvent.stopPropagation(e);
+                });
+                return slider;
+            }
+            sliderControl.addTo(map);
+        }
+ function drawInfo() {
+                var info = L.control({
+                    position: 'topleft'
+                });
+                info.onAdd = function (map) {
+                    var div = L.DomUtil.create('div', 'info');
+
+                    return div;
+                }
+                info.addTo(map);
+                var html = "<h3><b>Mouse over counties for detailed information</b></h3>"
+                $(".info").html(html);
+            }
+        function updateInfo(layer) {
+            var props = layer.feature.properties;
+            var years = '';
+            for (var year in props) {
+                if(year !="NAME" && year !="CNTY" && year != "STATE"){
+                years +=  "<b>"+year + ": </b>" + props[year] + "<br>".toLocaleString()
+                }else{}
+            }
+            var html = "<h3>" + props['NAME'] + " County</h3><b>Unemployment by Year</b><br>" + years
+            $(".info").html(html);
+        }
+
+        // function to create the range slider
+    </script>
+
+</body>
+
+</html>

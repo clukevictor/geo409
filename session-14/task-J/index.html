@@ -103,7 +103,7 @@
         <h1>Kentucky Housing:</h1>
         <h2>Characteristics of Vacancy in Kentucky Housing</h2>
     </header>
-
+    <!--Creates the drop down menu and provides options there within-->
 
     <div id='map'></div>
 
@@ -288,11 +288,9 @@
         function ddList() {
             for (var vacancy in labels) {
                 $('#item').append('<option>' + labels[vacancy] + '</option>');
-                console.log(item)
             }
         }
     </script>
-      <!--Creates the drop down menu and provides options there within-->
     <div id='ui-controls'>
         <label>Choose a data attribute:
             <br>
@@ -302,8 +300,7 @@
                 <option value="VACANT_REN">vancant units, rented not occupied</option>
                 <option value="VACANT_FOR">vacant units, for sale only</option>
             </select>
-            <select  id="item" selected></select>
-            
+            <select ddList id="item" value=item[0] selected></select>
         </label>
 
     </div>

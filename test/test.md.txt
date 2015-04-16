@@ -1,1 +1,4 @@
 git commit [-A] -m "add text to test file"
+
+
+git push origin master

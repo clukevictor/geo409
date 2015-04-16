@@ -209,14 +209,14 @@
                 var value = Number(layer.feature.properties[year]);
                 breakPoints.push(value);
             })
-            var breaks = ss.quantile(breakPoints, [0, 0.2, 0.4, 0.6, 0.8, 1]);
+            var breaks = ss.quantile(breakPoints, [0, 0.2, 0.4, 0.6, 0.8, 1]); // we have 5 classes here
             return breaks
         };
         //
         function getBreakColor(d, breaks) {
-                var color = ['rgb(237,248,251)', 'rgb(204,236,230)', 'rgb(153,216,201)', 'rgb(102,194,164)', 'rgb(44,162,95)', 'rgb(0,109,44)'];
-                for (i = 0; i < 5; i++) {
-                    if (d <= breaks[i + 1]) {
+                var color = ['rgb(237,248,251)', 'rgb(204,236,230)', 'rgb(153,216,201)', 'rgb(102,194,164)', 'rgb(44,162,95)']; // but 6 colors here, that's why the first one is duplicated currently?
+                for (i = 0; i < breaks.length; i++) { // make more general
+                    if (d <= breaks[i+1]) {
                         return color[i]
                     } else {}
                 }
@@ -248,8 +248,8 @@
         function updateLegend(breaks) {
             var legend = $('.legend').html("<h3>Unemployment in " + year + "</h3.,ul>");
             console.log(legend)
-            for (var i = 0; i < breaks.length - 1; i++) {
-                var coloring = getBreakColor(breaks[i], breaks);
+            for (var i = 0; i < breaks.length-1; i++) {
+                var coloring = getBreakColor(breaks[i+1], breaks);
                 legend.append('<li><span style="background:' + coloring + '"></span>' + (breaks[i]).toLocaleString() + ' &mdash; ' + (breaks[i + 1]).toLocaleString() + "%" + '</li>');
             }
             legend.append("<ul>");

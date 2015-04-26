@@ -125,12 +125,13 @@
 
         // AJAX requests to load data files
         $.getJSON("us-states.json", function (states) {
+            console.log(states)
             Papa.parse('states-unemployment.csv', {
                 download: true,
                 header: true,
                 complete: function (data) {
                     // data is accessible to us here
-
+console.log(data)
 
                     processData(states, data);
 

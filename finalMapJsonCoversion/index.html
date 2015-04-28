@@ -156,41 +156,51 @@
         }); /*end*/
         //        // function to process/bind data
         function processData(counties, data) { /*need to include both paramaters so can be accessed by function*/
-                //            console.log(counties, counties.features)
-                for (var county in counties.features) {
-                    //console.log(counties, counties.features)
-                    var props = counties.features[county].properties;
-                    //console.log(props)
-                    //                console.log(d, data.data, data.data[d])
-                    for (var d in data.data) {
+            //            console.log(counties, counties.features)
+            for (var county in counties.features) {
+                //console.log(counties, counties.features)
+                var props = counties.features[county].properties;
+                //console.log(props)
+                //                console.log(d, data.data, data.data[d])
+                for (var d in data.data) {
+                    if (props.GISJOIN == data.data[d].GISJOIN) { /*makes sure parsing is aligned*/
+//                                                    props = yearData; /*adds object created earlier to properties of county json object*/
+                        //                            console.log(props.yearData)
+//                                                    for (var y in props.yearData) { /*makes sure the if can access all years in yearData but problem is year data does not exist yet*/
+                        //                                console.log("hi")
+//                                                    if (data.data[d].year != counties.features[county].properties.yearData[y]) /*seeks to add only those years which are not already with in year data*/{
+                        //                                yearData += data.data[d].year
+                        props = data.data[d]; /*binds data together*/
+                        //                                props.yearData = yearData;
+                        //                            } else {
+                        //                                counties.features[county].properties = data.data[d];
+                        //
+                        //                            }
+                        //                            };
 
-                        if (props.GISJOIN == data.data[d].GISJOIN) {
-                            //                            props = yearData;
-                            //                            console.log(props.yearData)
-                            //                            for (var y in props.yearData) {
-                            //                                console.log("hi")
-                            //                            if (data.data[d].year != counties.features[county].properties.yearData[y]) {
-                            //                                yearData += data.data[d].year
-                            counties.features[county].properties = data.data[d];
-                            //                                props.yearData = yearData;
-                            //                            } else {
-                            //                                counties.features[county].properties = data.data[d];
-                            //
-                            //                            }
-                            //                            };
+                        break;
+                    } // inner for loop is complete
+                    console.log(props.year)/*the problem here is that I cannot access props.year because it has not been parsed together yer so props.year doesn't exist, but if I move it outsided of papa parse than I cannot access data* */
+                    for (y in props.year) {
+                        if (props.yearData) {
+                            if (data.data[d].year != props.year[y]) {
+                                props.yearData += data.data[d].year
+                            } else {
+                            }
+                        } else{
+                            props.yearData = props.year
+                        }
+                    }
 
-                            break;
 
-                        } // inner for loop is complete
+                } // outer for loop is complete
+                console.log(counties);
+            };
+        }
 
-                    } // outer for loop is complete
-                    console.log(counties);
-                };
-            }
-        
-            //
-            //
-            // function to draw the map
+        //
+        //
+        // function to draw the map
         function drawMap() {
             var breaks = getClassBreaks();
 

@@ -165,19 +165,19 @@
                     for (var d in data.data) {
 
                         if (props.GISJOIN == data.data[d].GISJOIN) {
-                            props = yearData;
-//                            console.log(props.yearData)
-//                            for (var y in props.yearData) {
-//                                console.log("hi")
-                                    //                            if (data.data[d].year != counties.features[county].properties.yearData[y]) {
-//                                yearData += data.data[d].year
-                                counties.features[county].properties = data.data[d];
-//                                props.yearData = yearData;
-                                //                            } else {
-                                //                                counties.features[county].properties = data.data[d];
-                                //
-                                //                            }
-//                            };
+                            //                            props = yearData;
+                            //                            console.log(props.yearData)
+                            //                            for (var y in props.yearData) {
+                            //                                console.log("hi")
+                            //                            if (data.data[d].year != counties.features[county].properties.yearData[y]) {
+                            //                                yearData += data.data[d].year
+                            counties.features[county].properties = data.data[d];
+                            //                                props.yearData = yearData;
+                            //                            } else {
+                            //                                counties.features[county].properties = data.data[d];
+                            //
+                            //                            }
+                            //                            };
 
                             break;
 
@@ -186,149 +186,150 @@
                     } // outer for loop is complete
                     console.log(counties);
                 };
-        }
-                //
-                //
-                // function to draw the map
-                function drawMap() {
-                    var breaks = getClassBreaks();
+            }
+        
+            //
+            //
+            // function to draw the map
+        function drawMap() {
+            var breaks = getClassBreaks();
 
-                    dataLayer1930map.eachLayer(function (layer) {
-                        var props = layer.feature.properties
-                        layer.setStyle({
-                            fillColor: getColor(Number(props[attribute]), breaks)
-                        });
-                        layer.bindPopup(props[attribute]);
-                        layer.on('click', function () {
-                            layer.openPopup()
-                        })
-
-                        updateLegend(breaks);
-                    });
-                }
-
-                $('select[name="unemployment"]').change(function () {
-                    attribute = $(this).val();
-                    drawMap();
-
+            dataLayer1930map.eachLayer(function (layer) {
+                var props = layer.feature.properties
+                layer.setStyle({
+                    fillColor: getColor(Number(props[attribute]), breaks)
                 });
-                $(".year-slider")
-                    .on('input change', function () {
-                        attribute = $(this).val();
-                        drawMap();
-                    })
-                    // function to update the map
+                layer.bindPopup(props[attribute]);
+                layer.on('click', function () {
+                    layer.openPopup()
+                })
 
-                function ui() {
-                        var dataView = L.control({
-                            position: 'bottomleft'
-                        });
-                        //.onAdd? is this creating an object from annymous function
-                        dataView.onAdd = function (map) {
-                            var controls = L.DomUtil.get('ui-controls');
-                            return controls;
-                        }
-                        dataView.addTo(map);
+                updateLegend(breaks);
+            });
+        }
 
+        $('select[name="unemployment"]').change(function () {
+            attribute = $(this).val();
+            drawMap();
+
+        });
+        $(".year-slider")
+            .on('input change', function () {
+                attribute = $(this).val();
+                drawMap();
+            })
+            // function to update the map
+
+        function ui() {
+                var dataView = L.control({
+                    position: 'bottomleft'
+                });
+                //.onAdd? is this creating an object from annymous function
+                dataView.onAdd = function (map) {
+                    var controls = L.DomUtil.get('ui-controls');
+                    return controls;
+                }
+                dataView.addTo(map);
+
+            }
+            // function get the class breaks   
+        function getClassBreaks() {
+            var values = {};
+            dataLayer1930map.eachLayer(function (layer) {
+                var value = layer.feature.properties[attribute];
+
+                values.push(value);
+                //                    console.log(values);
+            });
+
+            var breaks = ss.quantile(values, [0, 0.2, 0.4, 0.6, 0.8, 1]);
+            //creates 5 categories that the values will fall into
+            //            console.log(breaks)
+            return breaks;
+        };
+        // function to get the color value
+        function getColor(d, breaks) {
+                var color = ['rgb(237,248,251)', 'rgb(178,226,226)', 'rgb(102,194,164)', 'rgb(44,162,95)', 'rgb(0,109,44)'];
+                for (i = 0; i < 5; i++) {
+                    if (d <= breaks[i + 1]) {
+                        return color[i]
                     }
-                    // function get the class breaks   
-                function getClassBreaks() {
-                    var values = {};
-                    dataLayer1930map.eachLayer(function (layer) {
-                        var value = layer.feature.properties[attribute];
+                }
+            }
+            // function to draw the legend
+        function drawLegend() {
 
-                        values.push(value);
-                        //                    console.log(values);
+                // create a new Leaflet control object, and position it top left
+                var legend = L.control({
+                    position: 'topleft'
+                });
+
+                // when the legend is added to the map
+                legend.onAdd = function (map) {
+
+                    // create a div element with an class attribute of legend
+                    var div = L.DomUtil.create('div', 'legend');
+
+                    // return the div to the method
+                    return div;
+
+                };
+
+                // add the empty legend div to the map
+                legend.addTo(map);
+            }
+            // function to update the legend
+        function updateLegend(breaks) {
+
+            // select the legend, add a title, begin an unordered list and assign to a variable
+            //            console.log(attribute);
+            var legend = $('.legend').html("<h3>Unemployment in " + attribute + "</h3><ul>");
+
+            // loop through the Array of classification break values
+            for (var i = 0; i < breaks.length - 1; i++) {
+
+                // get a color value for each
+                var color = getColor(breaks[i], breaks);
+                //                console.log(color)
+                // append a list item to the legend
+                legend.append('<li><span style="background:' + color + '"></span> ' +
+                    (breaks[i]).toLocaleString() + ' &mdash; ' +
+                    (breaks[i + 1]).toLocaleString() + "% " + '</li>');
+            }
+
+            // close the legend's unordered list
+            legend.append("</ul>");
+        }
+
+        function createSliderUI() {
+                // create a Leaflet control object and store a reference to it in a variable
+                var sliderControl = L.control({
+                    position: 'bottomleft'
+                });
+
+                // when we add this control object to the map
+                sliderControl.onAdd = function (map) {
+
+                    // select an existing DOM element with an id of "ui-controls"
+                    var slider = L.DomUtil.get("ui-controls");
+
+                    // when the user clicks on the slider element
+                    L.DomEvent.addListener(slider, 'mousedown', function (e) {
+
+                        // prevent the click event from bubbling up to the map
+                        L.DomEvent.stopPropagation(e);
+
                     });
 
-                    var breaks = ss.quantile(values, [0, 0.2, 0.4, 0.6, 0.8, 1]);
-                    //creates 5 categories that the values will fall into
-                    //            console.log(breaks)
-                    return breaks;
-                };
-                // function to get the color value
-                function getColor(d, breaks) {
-                        var color = ['rgb(237,248,251)', 'rgb(178,226,226)', 'rgb(102,194,164)', 'rgb(44,162,95)', 'rgb(0,109,44)'];
-                        for (i = 0; i < 5; i++) {
-                            if (d <= breaks[i + 1]) {
-                                return color[i]
-                            }
-                        }
-                    }
-                    // function to draw the legend
-                function drawLegend() {
-
-                        // create a new Leaflet control object, and position it top left
-                        var legend = L.control({
-                            position: 'topleft'
-                        });
-
-                        // when the legend is added to the map
-                        legend.onAdd = function (map) {
-
-                            // create a div element with an class attribute of legend
-                            var div = L.DomUtil.create('div', 'legend');
-
-                            // return the div to the method
-                            return div;
-
-                        };
-
-                        // add the empty legend div to the map
-                        legend.addTo(map);
-                    }
-                    // function to update the legend
-                function updateLegend(breaks) {
-
-                    // select the legend, add a title, begin an unordered list and assign to a variable
-                    //            console.log(attribute);
-                    var legend = $('.legend').html("<h3>Unemployment in " + attribute + "</h3><ul>");
-
-                    // loop through the Array of classification break values
-                    for (var i = 0; i < breaks.length - 1; i++) {
-
-                        // get a color value for each
-                        var color = getColor(breaks[i], breaks);
-                        //                console.log(color)
-                        // append a list item to the legend
-                        legend.append('<li><span style="background:' + color + '"></span> ' +
-                            (breaks[i]).toLocaleString() + ' &mdash; ' +
-                            (breaks[i + 1]).toLocaleString() + "% " + '</li>');
-                    }
-
-                    // close the legend's unordered list
-                    legend.append("</ul>");
+                    // return the slider from the onAdd method
+                    return slider;
                 }
 
-                function createSliderUI() {
-                        // create a Leaflet control object and store a reference to it in a variable
-                        var sliderControl = L.control({
-                            position: 'bottomleft'
-                        });
+            }
+            // add the control object containing our slider element to the map
+            //        sliderControl.addTo(map);
 
-                        // when we add this control object to the map
-                        sliderControl.onAdd = function (map) {
-
-                            // select an existing DOM element with an id of "ui-controls"
-                            var slider = L.DomUtil.get("ui-controls");
-
-                            // when the user clicks on the slider element
-                            L.DomEvent.addListener(slider, 'mousedown', function (e) {
-
-                                // prevent the click event from bubbling up to the map
-                                L.DomEvent.stopPropagation(e);
-
-                            });
-
-                            // return the slider from the onAdd method
-                            return slider;
-                        }
-
-                    }
-                    // add the control object containing our slider element to the map
-                    //        sliderControl.addTo(map);
-
-                //         function to create the range slider
+        //         function to create the range slider
     </script>
 
 </body>
